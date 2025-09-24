@@ -91,8 +91,9 @@ int main(){
                         
     ofstream fp("tela.ppm", ios::binary);
 
-    fp << "P6\n" << nCol << " " << nLin << "\n255\n";
+    fp << "P6\n" << nCol << " " << nLin << "\n255\n";    // Gera cabeçalho PPM 
 
+    // Definir deltaX e deltaY - Tamanho de 1 quadrante do Canvas
     float Dx = wJanela/nCol;
     float Dy = hJanela/nLin;
 
@@ -103,16 +104,23 @@ int main(){
         for (int c = 0; c < nCol; c++) {
             float x = - (wJanela/2) + (Dx/2) + c*Dx;
 
-            Point pj(x, y, -dJanela);
+            Point pj(x, y, -dJanela);    // Ponto correspondente ao centro do quadrante
             
-            Vector Dr(pj.x - olhoPintor.x, pj.y - olhoPintor.y, pj.z - olhoPintor.z);
+            Vector Dr(pj.x - olhoPintor.x, pj.y - olhoPintor.y, pj.z - olhoPintor.z); // Vetor que corresponde ao raio que saio do olho e passa no centro do quadrante
 
             float normaDr = calculaNorma(Dr);
 
-            Vector dr((Dr.x/normaDr), (Dr.y/normaDr), (Dr.z/normaDr));
+            Vector dr((Dr.x/normaDr), (Dr.y/normaDr), (Dr.z/normaDr)); // Vetor Unitário
+            
+            // De acordo com o processo matemático calculado, criamos o vetor w, que corresponde ao ponto olhoPintor - centroEsfera
+            // P(t) = Po + t*dr -> Pj = Po + t*dr -> Pj - C = Po + t*dr - C => Po - C + t*dr => w + t*dr
             
             Vector w(olhoPintor.x - centroEsfera.x, olhoPintor.y - centroEsfera.y, olhoPintor.z - centroEsfera.z);
 
+            // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
+            // No entando, por agora apenas precisamos saber se o discriminante é maior ou menor que 0
+            // Quando formos implementar a iluminação, iremos precisar dos valores de t
+            
             float a = calculaProdutoEscalar(dr, dr); 
 
             float bDelta = 2 * calculaProdutoEscalar(w, dr);
@@ -121,7 +129,7 @@ int main(){
 
             float delta = pow(bDelta,2) - (4 * a * cDelta);
 
-            static unsigned char color[3];
+            // Se o delta é positivo ou 0, encontramos a esfera, se não pintamos com a cor de background
             if(delta >= 0) {
                 fp.put(esfColor.r);
                 fp.put(esfColor.g);
