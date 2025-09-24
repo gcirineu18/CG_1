@@ -1,6 +1,7 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
-#include <vector>
+
 using namespace std;
 
 /*
@@ -24,12 +25,8 @@ class Point {
         int p;
 
         // Construtor
-        Point(float x,float y, float z){
-            this->x = x;
-            this->y = y;
-            this->z = z;
-            this->p = 1;
-        }
+        Point(float x, float y, float z)
+        : x(x), y(y), z(z), p(1) {}
 };
 
 class Vector {
@@ -40,14 +37,31 @@ class Vector {
         int v;       
 
         // Construtor
-        Vector(float x, float y, float z) {
-            this->x = x;
-            this->y = y;
-            this->z = z;
-            this->v = 0;
-        };
+        Vector(float x, float y, float z)
+        : x(x), y(y), z(z), v(1) {}
 };
 
+class Color {
+public:
+    int r;
+    int g;
+    int b;
+
+    // Construtor
+    Color(int r, int g, int b)
+        : r(r), g(g), b(b) {}
+};
+
+class Janela {
+public:
+    float largura;
+    float altura;
+    Point centro;
+
+    // Construtor
+    Janela(float largura, float altura, Point centro)
+        : largura(largura), altura(altura), centro(centro) {}
+};
 
 float calculaNorma(Vector& v){  
  return sqrt(pow(v.x,2) + pow(v.y,2) + pow(v.z,2));
@@ -56,8 +70,6 @@ float calculaNorma(Vector& v){
 float calculaProdutoEscalar(Vector& v, Vector& p){
     return (v.x * p.x) + (v.y * p.y) + (v.z * p.z);
 }
-
-
 
 int main(){
 
@@ -68,18 +80,18 @@ int main(){
     float hJanela = 4.0;
     Point centroJanela(0, 0, -dJanela);
 
-    vector<int> esfColor = {255, 0, 0};
+    Color esfColor(255, 0, 0);
     float rEsfera = 1.0;
     Point centroEsfera(0, 0, -(dJanela + rEsfera));
 
-    vector<int> bgColor = {100, 100, 100};
+    Color bgColor(100, 100, 100);
 
     int nCol = 400;
     int nLin = 400;
                         
-    FILE *fp = fopen("tela.ppm", "wb");
-    
-    fprintf(fp, "P6\n%d %d\n255\n", nCol, nLin);
+    ofstream fp("tela.ppm", ios::binary);
+
+    fp << "P6\n" << nCol << " " << nLin << "\n255\n";
 
     float Dx = wJanela/nCol;
     float Dy = hJanela/nLin;
@@ -111,21 +123,19 @@ int main(){
 
             static unsigned char color[3];
             if(delta >= 0) {
-                color[0] = esfColor[0];  
-                color[1] = esfColor[1];  
-                color[2] = esfColor[2];  
+                fp.put(esfColor.r);
+                fp.put(esfColor.g);
+                fp.put(esfColor.b);  
             } else {
-                color[0] = bgColor[0];   
-                color[1] = bgColor[1];   
-                color[2] = bgColor[2];   
+                fp.put(bgColor.r);
+                fp.put(bgColor.r);
+                fp.put(bgColor.r);   
             }
-
-            fwrite(color, 1, 3, fp);
         }
     }
 
-    fclose(fp);
-    
+    fp.close();
+    cout << "Imagem gerada." << endl;
     return 0;
 }
 
