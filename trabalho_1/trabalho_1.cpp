@@ -48,29 +48,12 @@ class Vector {
         };
 };
 
-class Ray{
-    public:
-       Point p0; 
-       int t;
-       
-    //    Ray(Point p0, int t){
-    //     this->p0 = new Point(p0.x, p0.y, p0.z);
-    //     this->t = t;
-    //    };
-       
-};
 
-/*
-float calcularIntersecaoRaio() {                            - Talvez n precisa, pois como eh 2D 
-                                                              o rEsfera eh suficiente para saber 
-}                                                             se esta dentro ou fora da area da esfera.
-*/
-
-int calculaNorma(Vector& v){  
+float calculaNorma(Vector& v){  
  return sqrt(pow(v.x,2) + pow(v.y,2) + pow(v.z,2));
 }
 
-int calculaProdutoEscalar(Vector& v, Vector& p){
+float calculaProdutoEscalar(Vector& v, Vector& p){
     return (v.x * p.x) + (v.y * p.y) + (v.z * p.z);
 }
 
@@ -91,12 +74,12 @@ int main(){
 
     vector<int> bgColor = {100, 100, 100};
 
-    int nCol = 100;
-    int nLin = 100;
-
-    //int matCanvas[100][100];
-
-    vector<vector<vector<int>>> matCanvas(nLin, vector<vector<int>>(nCol, vector<int>(3, 0)));
+    int nCol = 400;
+    int nLin = 400;
+                        
+    FILE *fp = fopen("tela.ppm", "wb");
+    
+    fprintf(fp, "P6\n%d %d\n255\n", nCol, nLin);
 
     float Dx = wJanela/nCol;
     float Dy = hJanela/nLin;
@@ -112,36 +95,37 @@ int main(){
             
             Vector Dr(pj.x - olhoPintor.x, pj.y - olhoPintor.y, pj.z - olhoPintor.z);
 
-            int normaDr = calculaNorma(Dr);
+            float normaDr = calculaNorma(Dr);
 
             Vector dr((Dr.x/normaDr), (Dr.y/normaDr), (Dr.z/normaDr));
             
             Vector w(olhoPintor.x - centroEsfera.x, olhoPintor.y - centroEsfera.y, olhoPintor.z - centroEsfera.z);
 
-            int bDelta = 2 * calculaProdutoEscalar(w, dr);
+            float a = calculaProdutoEscalar(dr, dr); 
 
-            int cDelta = pow(rEsfera, 2) * calculaProdutoEscalar(w, w);
+            float bDelta = 2 * calculaProdutoEscalar(w, dr);
 
-            int delta = pow(bDelta,2) + 4 * cDelta;
+            float cDelta = calculaProdutoEscalar(w, w) - pow(rEsfera, 2) ;
 
+            float delta = pow(bDelta,2) - (4 * a * cDelta);
+
+            static unsigned char color[3];
             if(delta >= 0) {
-                matCanvas[l][c][0] = esfColor[0];  
-                matCanvas[l][c][1] = esfColor[1];  
-                matCanvas[l][c][2] = esfColor[2];  
+                color[0] = esfColor[0];  
+                color[1] = esfColor[1];  
+                color[2] = esfColor[2];  
             } else {
-                matCanvas[l][c][0] = bgColor[0];   
-                matCanvas[l][c][1] = bgColor[1];   
-                matCanvas[l][c][2] = bgColor[2];   
+                color[0] = bgColor[0];   
+                color[1] = bgColor[1];   
+                color[2] = bgColor[2];   
             }
-            // Cast um raio de olhoPintor para P - talvez n (?)
 
-            // calcura distancia entre P e centroEsfera
-
-            // Se distancia P-centroEsfera > rEsfera => bgColor
-            // Senao => esfColor
+            fwrite(color, 1, 3, fp);
         }
     }
 
+    fclose(fp);
+    
     return 0;
 }
 
