@@ -111,29 +111,29 @@ Vector arroba(Vector& v, Vector& p) {
 
 int main(){
 
-    Point olhoPintor(0, 0, 0);
+    Point olhoPintor(0.0f, 0.0f, 0.0f);
 
-    float dJanela = 20.0;
-    float wJanela = 4.0;
-    float hJanela = 4.0;
-    Point centroJanela(0, 0, -dJanela);
+    float dJanela = 4.0f;
+    float wJanela = 4.0f;
+    float hJanela = 4.0f;
+    Point centroJanela(0.0f, 0.0f, -dJanela);
 
     Color esfColor(255, 0, 0);
-    float rEsfera = 1.0;
-    Point centroEsfera(0, 0, -(dJanela + rEsfera));
+    float rEsfera = 1.0f;
+    Point centroEsfera(0.0f, 0.0f, -(dJanela + rEsfera));
 
     Color bgColor(100, 100, 100);
 
     int nCol = 400;
     int nLin = 400;
 
-    Vector i_f(0.7, 0.7, 0.7);
-    Point p_f(0, 5, 0);
+    Vector i_f(0.7f, 0.7f, 0.7f);
+    Point p_f(0.0f, 5.0f, 0.0f);
 
-    Vector K(1, 0, 0);
+    Vector K(1.0f, 0.0f, 0.0f);
     // Vamos tratar i_f e K como Vetores para fazermos os cálculos e após tudo vamo transformá-los para Color
 
-    float m = 10.0;
+    float m = 10.0f;
 
     ofstream fp("tela.ppm", ios::binary);
 
@@ -187,7 +187,7 @@ int main(){
 
                 float t = minimo(t1, t2);
 
-                // Calcular vetores n, l, v e r
+                /* Calcular vetores n, l, v e r */
 
                 // Calcula P(t) de acordo com a equação do Ray
                 Vector tdr = produtoVetorEscalar(t, dr);
@@ -207,21 +207,25 @@ int main(){
 
                 // Calcula r
                 float ln = calculaProdutoEscalar(l, n);
-                Vector lnn = produtoVetorEscalar(ln ,n);
-                Vector r(lnn.x - l.x, lnn.y- l.y, lnn.z - l.z);
+                Vector r((2*ln*n.x) - l.x, (2*ln*n.y) - l.y, (2 * ln*n.z) - l.z);
 
                 // Calcular Id e Ie
+                float ln_limitado = max(0.0f, calculaProdutoEscalar(l, n));
                 Vector Ifk = arroba(i_f, K);
-                Vector Id = produtoVetorEscalar(ln, Ifk);
+                Vector Id = produtoVetorEscalar(ln_limitado, Ifk);
 
-                float rx = calculaProdutoEscalar(r, x);
+                float rx = max(0.0f, calculaProdutoEscalar(r, x));
                 float rxm = pow(rx, m);
                 Vector Ie = produtoVetorEscalar(rxm, Ifk);
 
                 Vector I_E(Ie.x + Id.x, Ie.y + Id.y, Ie.z + Id.z);
 
                 // Imprimir as cores no arquivo
-                fp.put(I_E.x * 255);
+                if (I_E.x > 1.0f){
+                    fp.put(255);
+                } else{
+                    fp.put(I_E.x * 255);
+                }
                 fp.put(I_E.y * 255);
                 fp.put(I_E.z * 255);
             }
