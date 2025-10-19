@@ -25,6 +25,10 @@ float prod_escalar(vector<float>& v, vector<float>& p){
     return (v[0] * p[0]) + (v[1] * p[1]) + (v[2] * p[2]);
 }
 
+/*vector<float> prod_vetorial(vector<float>& v, vector<float>& p){
+    
+}*/
+
 vector<float> mult_escalar(vector<float>& v, float x) {
     vector<float> q;
     if (v[3] == 1)
@@ -74,33 +78,49 @@ int main() {
     vector<float> olhoPintor = criarPonto(0.0f, 0.0f, 0.0f);
 
     // Definir características da Janela
-    float dJanela = 4.0f;
-    float wJanela = 4.0f;
-    float hJanela = 4.0f;
+    float dJanela = 30.0f;
+    float wJanela = 60.0f;
+    float hJanela = 60.0f;
     vector<float> centroJanela = criarPonto(0.0f, 0.0f, -dJanela);
 
     // Definir características da Tela de Mosquito
-    int nCol = 400;
-    int nLin = 400;
+    int nCol = 500;
+    int nLin = 500;
     float Dx = wJanela/nCol;    /* Medidas de  1 quadrante da tela de mosquito */
     float Dy = hJanela/nLin;
 
     // Definir cor do Background - Cinza
-    vector<float> bgColor = criarPonto(100,100,100);
+    vector<float> bgColor = criarVetor(100,100,100);
 
-    // Definir características da Fonte Luminosa
-    vector<float> fonte_int = criarPonto(0.7f, 0.7f, 0.7f);
-    vector<float> fonte_coord = criarPonto(0.0f, 4.0f, 0.0f);
-    vector<float> K = criarPonto(1.0f, 0.0f, 0.0f);
+    // Definir características da Fonte Pontual
+    vector<float> fonte_p_int = criarVetor(0.7f, 0.7f, 0.7f);
+    vector<float> fonte_p_coord = criarPonto(0.0f, 60.0f, -30.0f);
 
-    // m
-    float m = 10.0f;
+    // Definir características da Fonte Ambiente
+    vector<float> I_A = criarVetor(0.3f, 0.3f, 0.3f);
 
     /* ============= OBJETOS DA CENA ============= */
     // Iniciar Esfera
-    float rEsfera = 1.0f;
-    vector<float> esfColor = criarPonto(255, 0, 0);
-    vector<float> centroEsfera = criarPonto(0.0f, 0.0f, -(dJanela + rEsfera));
+    float rEsfera = 40.0f;
+    vector<float> esfColor = criarVetor(255, 0, 0);
+    vector<float> centroEsfera = criarPonto(0.0f, 0.0f, -100.0f);
+    vector<float> K_esf = criarVetor(0.7f, 0.2f, 0.2f);
+    float m_esf = 10.0f;
+
+    // Plano de Chão
+    vector<float> P_pi_c = criarPonto(0.0f, -rEsfera, 0.0f);
+    vector<float> n_bar_c = criarVetor(0.0f, 1.0f, 0.0f);
+    vector<float> Kd_c = criarVetor(0.2f, 0.7f, 0.2f);
+    vector<float> Ke_c = criarVetor(0.0f, 0.0f, 0.0f);
+    float m_c = 1.0f;
+
+    // Plano de Fundo
+    vector<float> P_pi_f = criarPonto(0.0f, 0.0f, -200.0f);
+    vector<float> n_bar_f = criarVetor(0.0f, 0.0f, 1.0f);
+    vector<float> Kd_f = criarVetor(0.3f, 0.3f, 0.7f);
+    vector<float> Ke_f = criarVetor(0.0f, 0.0f, 0.0f);
+    float m_f = 1.0f;
+
 
     /* ============= ARQUIVO PPM - Cabeçalho ============= */
     ofstream fp("tela.ppm", ios::binary);
@@ -128,17 +148,14 @@ int main() {
             // De acordo com o processo matemático calculado, criamos o vetor w, que corresponde ao ponto olhoPintor - centroEsfera
             // P(t) = Po + t*dr -> Pj = Po + t*dr -> Pj - C = Po + t*dr - C => Po - C + t*dr => w + t*dr
 
-            vector<float> w = subt(olhoPintor, centroEsfera);
+            vector<float> w_esf = subt(olhoPintor, centroEsfera);
 
             // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
-            // No entando, por agora apenas precisamos saber se o discriminante é maior ou menor que 0
-            // Quando formos implementar a iluminação, iremos precisar dos valores de t
-
             float aDelta = prod_escalar(dr_u, dr_u);
 
-            float bDelta = 2 * prod_escalar(w, dr_u);
+            float bDelta = 2 * prod_escalar(w_esf, dr_u);
 
-            float cDelta = prod_escalar(w, w) - pow(rEsfera, 2) ;
+            float cDelta = prod_escalar(w_esf, w_esf) - pow(rEsfera, 2) ;
 
             float delta = pow(bDelta,2) - (4 * aDelta * cDelta);
 
@@ -161,7 +178,7 @@ int main() {
                 vector<float> n = div_escalar(PiC, rEsfera);
 
                 // Calcula l
-                vector<float> pfPI = subt(fonte_coord, Pi);
+                vector<float> pfPI = subt(fonte_p_coord, Pi);
                 float pfPI_norma = norma(pfPI);
                 vector<float> l = div_escalar(pfPI, pfPI_norma);
 
@@ -172,16 +189,18 @@ int main() {
                 float ln = prod_escalar(l, n);
                 vector<float> r = {(2*ln*n[0]) - l[0], (2*ln*n[1]) - l[1], (2 * ln*n[2]) - l[2]};
 
-                // Calcular Id e Ie
+                // Calcular Id e Ie e Iamb
                 float ln_limitado = max(0.0f, prod_escalar(l, n));
-                vector<float> Ifk = arroba(fonte_int, K);
+                vector<float> Ifk = arroba(fonte_p_int, K_esf);
                 vector<float> Id = mult_escalar(Ifk, ln_limitado);
 
                 float rx = max(0.0f, prod_escalar(r, x));
-                float rxm = pow(rx, m);
+                float rxm = pow(rx, m_esf);
                 vector<float> Ie = mult_escalar(Ifk, rxm);
 
-                vector<float> I_E = {Ie[0] + Id[0], Ie[1] + Id[1], Ie[2] + Id[2]};
+                vector<float> Iamb = arroba(I_A, K_esf);
+
+                vector<float> I_E = {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
 
                 // Imprimir as cores no arquivo
                 if (I_E[0] > 1.0f){
@@ -191,17 +210,43 @@ int main() {
                 }
                 fp.put(I_E[1] * 255);
                 fp.put(I_E[2] * 255);
-            }
-            /* else {
 
-                adicionar verificação para plano
+            } else {
+                /* ============= VERIFICAÇÃO PARA PLANO CHÃO ============= */
+                vector<float> w_p_chao = subt(olhoPintor, P_pi_c);
+                float wpcnc = prod_escalar(w_p_chao, n_bar_c);
+                float drnc = prod_escalar(dr_u, n_bar_c);
+                float ti_p_c = wpcnc / drnc;
 
-            } */
-            else {
-                fp.put(bgColor[0]);
-                fp.put(bgColor[1]);
-                fp.put(bgColor[2]);
+                if (ti_p_c >= 0) {
+                    fp.put(100);
+                    fp.put(100);
+                    fp.put(255);
+                } else {
+
+                    /* ============= VERIFICAÇÃO PARA PLANO FUNDO ============= */
+                    // Baseado na Equação do Plano (Pj - Ppi) n = 0, criamos um vetor w_p_fundo que corresponde a (Olho Pintor - Ppi)
+                    vector<float> w_p_fundo = subt(olhoPintor, P_pi_f);
+
+                    // Com isso, calculamos o ti, se for maior ou igual a 0, então o raio intercepta o plano.
+                    float wpfnf = - prod_escalar(w_p_fundo, n_bar_f);
+                    float drnf = prod_escalar(dr_u, n_bar_f);
+                    float ti_p_f = wpfnf / drnf;
+
+                    if (ti_p_f >= 0) {
+                        // o raio acerta o plano. Vamos calcular Id, Ie e Iamb para o plano de fundo
+                        fp.put(210);
+                        fp.put(210);
+                        fp.put(210);
+                    } else {
+                        fp.put(bgColor[0]);
+                        fp.put(bgColor[1]);
+                        fp.put(bgColor[2]);
+                    }
+                }
             }
+            /*
+            }*/
         }
     }
 
