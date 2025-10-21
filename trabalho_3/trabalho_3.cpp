@@ -59,10 +59,65 @@ vector<float> div_escalar(vector<float>& v, float x) {
     return d;
 }
 
+float calcula_ti_plano(vector<float> olhoPintor, vector<float> P_pi, vector<float> n_bar, vector<float> dr_u){
+    vector<float> w_p = subt(olhoPintor, P_pi);
+    float wpcn = - prod_escalar(w_p, n_bar);
+    float drn = prod_escalar(dr_u, n_bar);
+    return wpcn /drn;
+}
+
 vector<float> arroba(vector<float>& v, vector<float>& p) {
     vector<float> arr = criarVetor(v[0] * p[0], v[1] * p[1], v[2] * p[2]);
     return arr;
 }
+
+vector<float> calcular_intensidade_olho(vector<float> dr_u, vector<float> l, vector<float> n_bar, vector<float> fonte_p_int, vector<float> Kd, vector<float> Ke, float m, vector<float> I_A){
+    // Calcula x
+    vector<float> x = {-dr_u[0], -dr_u[1], -dr_u[2]};
+
+    // Calcula r
+    float ln = prod_escalar(l, n_bar);
+    vector<float> r = {(2*ln*n_bar[0]) - l[0], (2*ln*n_bar[1]) - l[1], (2 * ln*n_bar[2]) - l[2]};
+
+    // Calcular Id e Ie e Iamb
+    float ln_limitado = max(0.0f, ln);
+    vector<float> Ifkd = arroba(fonte_p_int, Kd);
+    vector<float> Id = mult_escalar(Ifkd, ln_limitado);
+
+    float rx = max(0.0f, prod_escalar(r, x));
+    float rxm = pow(rx, m);
+    vector<float> Ifke = arroba(fonte_p_int, Ke);
+    vector<float> Ie = mult_escalar(Ifke, rxm);
+
+    vector<float> Iamb = arroba(I_A, Kd);
+
+    return {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
+}
+
+float calcula_delta_plano(vector<float>*l, vector<float> dr_u, float ti_p, vector<float> olhoPintor, vector<float> fonte_p_coord, vector<float> centroEsfera, float rEsfera){
+    // Calcula P(t) de acordo com a equação do Ray
+    vector<float> tdr = mult_escalar(dr_u, ti_p);
+    vector<float> Pi = soma(olhoPintor, tdr);
+
+    // Calcula l
+    vector<float> pfPI = subt(fonte_p_coord, Pi);
+    float pfPI_norma = norma(pfPI);
+     *l = div_escalar(pfPI, pfPI_norma);
+
+    // P(s) = Pi + s*l
+    vector<float> s_esf = subt(Pi, centroEsfera);
+
+    // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
+    float aDelta = prod_escalar(*l, *l);
+
+    float bDelta = 2 * prod_escalar(s_esf, *l);
+
+    float cDelta = prod_escalar(s_esf, s_esf) - pow(rEsfera, 2) ;
+
+    return pow(bDelta,2) - (4 * aDelta * cDelta);
+}
+
+
 
 float minimo(float x, float y) {
     if (x <= y) {
@@ -213,63 +268,20 @@ int main() {
 
             } else {
                 /* ============= VERIFICAÇÃO PARA PLANO CHÃO ============= */
-                vector<float> w_p_chao = subt(olhoPintor, P_pi_c);
-                float wpcnc = - prod_escalar(w_p_chao, n_bar_c);
-                float drnc = prod_escalar(dr_u, n_bar_c);
-                float ti_p_c = wpcnc / drnc;
+                float ti_p_c = calcula_ti_plano(olhoPintor, P_pi_c, n_bar_c, dr_u);
 
                 /* ============= VERIFICAÇÃO PARA PLANO FUNDO ============= */
-                vector<float> w_p_fundo = subt(olhoPintor, P_pi_f);
-                float wpfnf = - prod_escalar(w_p_fundo, n_bar_f);
-                float drnf = prod_escalar(dr_u, n_bar_f);
-                float ti_p_f = wpfnf / drnf;
+                float ti_p_f = calcula_ti_plano(olhoPintor, P_pi_f, n_bar_f, dr_u);
 
                 if (ti_p_c <= ti_p_f && ti_p_c > 0) {
-                    // Calcula P(t) de acordo com a equação do Ray
-                    vector<float> tdr = mult_escalar(dr_u, ti_p_c);
-                    vector<float> Pi = soma(olhoPintor, tdr);
-
-                    // Calcula l
-                    vector<float> pfPI = subt(fonte_p_coord, Pi);
-                    float pfPI_norma = norma(pfPI);
-                    vector<float> l = div_escalar(pfPI, pfPI_norma);
-
-                    // P(s) = Pi + s*l
-                    vector<float> s_esf = subt(Pi, centroEsfera);
-
-                    // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
-                    float aDelta = prod_escalar(l, l);
-
-                    float bDelta = 2 * prod_escalar(s_esf, l);
-
-                    float cDelta = prod_escalar(s_esf, s_esf) - pow(rEsfera, 2) ;
-
-                    float delta = pow(bDelta,2) - (4 * aDelta * cDelta);
+                    vector<float> l;
+                    float delta = calcula_delta_plano(&l,dr_u, ti_p_c, olhoPintor, fonte_p_coord, centroEsfera, rEsfera);
 
                     if (delta >= 0) {
-                        l = criarVetor(0.0f, 0.0f, 0.0f);
+                       l = criarVetor(0.0f, 0.0f, 0.0f);
                     }
 
-                    // Calcula x
-                    vector<float> x = {-dr_u[0], -dr_u[1], -dr_u[2]};
-
-                    // Calcula r
-                    float ln = prod_escalar(l, n_bar_c);
-                    vector<float> r = {(2*ln*n_bar_c[0]) - l[0], (2*ln*n_bar_c[1]) - l[1], (2 * ln*n_bar_c[2]) - l[2]};
-
-                    // Calcular Id e Ie e Iamb
-                    float ln_limitado = max(0.0f, ln);
-                    vector<float> Ifkd = arroba(fonte_p_int, Kd_c);
-                    vector<float> Id = mult_escalar(Ifkd, ln_limitado);
-
-                    float rx = max(0.0f, prod_escalar(r, x));
-                    float rxm = pow(rx, m_c);
-                    vector<float> Ifke = arroba(fonte_p_int, Ke_c);
-                    vector<float> Ie = mult_escalar(Ifke, rxm);
-
-                    vector<float> Iamb = arroba(I_A, Kd_c);
-
-                    vector<float> I_E_c = {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
+                    vector<float> I_E_c = calcular_intensidade_olho(dr_u, l,n_bar_c, fonte_p_int, Kd_c, Ke_c, m_c, I_A);
                     
                     // Imprimir as cores no arquivo
                     if (I_E_c[0] > 1.0f){
@@ -289,51 +301,15 @@ int main() {
                     }
 
                 } else if (ti_p_f > 0) {
-                    // Calcula P(t) de acordo com a equação do Ray
-                    vector<float> tdr = mult_escalar(dr_u, ti_p_f);
-                    vector<float> Pi = soma(olhoPintor, tdr);
+                    vector<float> l;
 
-                    // Calcula l
-                    vector<float> pfPI = subt(fonte_p_coord, Pi);
-                    float pfPI_norma = norma(pfPI);
-                    vector<float> l = div_escalar(pfPI, pfPI_norma);
-
-                    // P(s) = Pi + s*l
-                    vector<float> s_esf = subt(Pi, centroEsfera);
-
-                    // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
-                    float aDelta = prod_escalar(l, l);
-
-                    float bDelta = 2 * prod_escalar(s_esf, l);
-
-                    float cDelta = prod_escalar(s_esf, s_esf) - pow(rEsfera, 2) ;
-
-                    float delta = pow(bDelta,2) - (4 * aDelta * cDelta);
+                    float delta = calcula_delta_plano(&l,dr_u, ti_p_f, olhoPintor, fonte_p_coord, centroEsfera, rEsfera);
 
                     if (delta >= 0) {
                         l = criarVetor(0.0f, 0.0f, 0.0f);
                     }
 
-                    // Calcula x
-                    vector<float> x = {-dr_u[0], -dr_u[1], -dr_u[2]};
-
-                    // Calcula r
-                    float ln = prod_escalar(l, n_bar_f);
-                    vector<float> r = {(2*ln*n_bar_f[0]) - l[0], (2*ln*n_bar_f[1]) - l[1], (2 * ln*n_bar_c[2]) - l[2]};
-
-                    // Calcular Id e Ie e Iamb
-                    float ln_limitado = max(0.0f, ln);
-                    vector<float> Ifkd = arroba(fonte_p_int, Kd_f);
-                    vector<float> Id = mult_escalar(Ifkd, ln_limitado);
-
-                    float rx = max(0.0f, prod_escalar(r, x));
-                    float rxm = pow(rx, m_f);
-                    vector<float> Ifke = arroba(fonte_p_int, Ke_f);
-                    vector<float> Ie = mult_escalar(Ifke, rxm);
-
-                    vector<float> Iamb = arroba(I_A, Kd_f);
-
-                    vector<float> I_E_f = {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
+                    vector<float> I_E_f = calcular_intensidade_olho(dr_u, l, n_bar_f, fonte_p_int, Kd_f, Ke_f, m_f, I_A); 
 
                     if (I_E_f[0] > 1.0f){
                         fp.put(255);
