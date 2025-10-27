@@ -2,8 +2,22 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include "cilindro.hpp"
+#include <algorithm>
 
 using namespace std;
+
+struct EsferaStruct{
+    float delta;
+    float aDelta;
+    float bDelta;
+};
+
+struct CilindroStruct{
+    float delta;
+    float aDelta;
+    float bDelta;
+};
 
 /* ============= FUNÇÕES ============= */
 
@@ -94,7 +108,7 @@ vector<float> calcular_intensidade_olho(vector<float> dr_u, vector<float> l, vec
     return {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
 }
 
-float calcula_delta_plano(vector<float>*l, vector<float> dr_u, float ti_p, vector<float> olhoPintor, vector<float> fonte_p_coord, vector<float> centroEsfera, float rEsfera){
+float calcula_delta_plano(vector<float>*l, vector<float> dr_u, float ti_p, vector<float> olhoPintor, vector<float> fonte_p_coord, vector<float> centroEsfera, float rEsfera, Cilindro *cilindro){
     // Calcula P(t) de acordo com a equação do Ray
     vector<float> tdr = mult_escalar(dr_u, ti_p);
     vector<float> Pi = soma(olhoPintor, tdr);
@@ -112,12 +126,11 @@ float calcula_delta_plano(vector<float>*l, vector<float> dr_u, float ti_p, vecto
 
     float bDelta = 2 * prod_escalar(s_esf, *l);
 
-    float cDelta = prod_escalar(s_esf, s_esf) - pow(rEsfera, 2) ;
+    float cDelta = prod_escalar(s_esf, s_esf) - pow(rEsfera, 2);
+    
 
     return pow(bDelta,2) - (4 * aDelta * cDelta);
 }
-
-
 
 float minimo(float x, float y) {
     if (x <= y) {
@@ -125,6 +138,106 @@ float minimo(float x, float y) {
     } else {
         return y;
     }
+}
+
+
+Cilindro* cria_cilindro( vector<float> centroEsfera, float rEsfera){
+    vector<float> centro_base = centroEsfera;
+    float raio_base = rEsfera/3;
+    float altura_cilindro = rEsfera * 3;
+    vector<float> d_cil = criarVetor(-1/sqrt(3), 1/sqrt(3), -1/sqrt(3));
+    vector<float> Kd = criarVetor( 0.2, 0.3, 0.8);
+    vector<float> Ke = criarVetor( 0.2, 0.3, 0.8);
+    vector<float> Ka = criarVetor( 0.2, 0.3, 0.8);
+
+    return new Cilindro(raio_base, centro_base, altura_cilindro, d_cil, Kd, Ke, Ka);
+}
+
+CilindroStruct gera_cilindro(Cilindro* cilindro, vector<float> dr_u, vector<float> olhoPintor){
+    vector<float> dCil = cilindro->getDcil();
+    vector<float> baseCil = cilindro->getCentroCil();
+    float raioCil = cilindro->getRaioCil();
+    float delta, a ,b;
+
+    float escalar_dr_dCil = prod_escalar(dCil, dr_u);
+    vector<float> mult_dr_dCil = mult_escalar(dCil, escalar_dr_dCil);
+
+    vector<float> w = subt(dr_u, mult_dr_dCil);
+
+
+    vector<float> pb = subt(olhoPintor,baseCil);
+    float escalar_pbu = prod_escalar(pb, dCil);
+    vector<float> mult_dCil_pbu = mult_escalar(dCil, escalar_pbu);
+
+    vector<float> v = subt(pb, mult_dCil_pbu);
+
+    a = prod_escalar(w, w);
+    b = prod_escalar(v, w);
+    float c = prod_escalar(v, v) - pow(raioCil,2);
+
+    delta = pow(b,2) - (a * c);
+     
+    return {delta, a, b};
+}
+
+float verifica_sombra_cilindro(Cilindro* cilindro, vector<float> l, vector<float> Pi, vector<float> fonte_p_coord, float t){
+    vector<float> dCil = cilindro->getDcil();
+    vector<float> baseCil = cilindro->getCentroCil();
+    float raioCil = cilindro->getRaioCil();
+    float alturaCil = cilindro->getAlturaCil();
+
+    float a, b;
+
+    // Calcula P(t) de acordo com a equação do Ray para o cilindro
+    
+    vector<float> pfPI = subt(fonte_p_coord, Pi);
+    float pfPI_norma = norma(pfPI);
+    l = div_escalar(pfPI, pfPI_norma);
+
+    vector<float> lt = mult_escalar(l,t);
+    vector<float> P = soma(Pi, lt);
+    vector<float> PiC = subt(P, baseCil);
+    float piC_dCil = prod_escalar(PiC, dCil);
+
+    if(piC_dCil < 0 || piC_dCil > alturaCil){
+        return -1.0;
+    }
+
+    float escalar_dr_dCil = prod_escalar(dCil, l);
+    vector<float> mult_dr_dCil = mult_escalar(dCil, escalar_dr_dCil);
+
+    vector<float> w = subt(l, mult_dr_dCil);
+
+
+    vector<float> pb = subt(Pi,baseCil);
+    float escalar_pbu = prod_escalar(pb, dCil);
+    vector<float> mult_dCil_pbu = mult_escalar(dCil, escalar_pbu);
+
+    vector<float> v = subt(pb, mult_dCil_pbu);
+
+    a = prod_escalar(w, w);
+    b = prod_escalar(v, w);
+    float c = prod_escalar(v, v) - pow(raioCil,2);
+
+    return pow(b,2) - (a * c);
+}
+
+EsferaStruct calcula_delta_esf(float x, float y, float z, vector<float> dr_u, vector<float> olhoPintor, vector<float> centroEsfera, float rEsfera){
+
+        /* ============= VERIFICAÇÃO PARA ESFERA ============= */
+        // De acordo com o processo matemático calculado, criamos o vetor w, que corresponde ao ponto olhoPintor - centroEsfera
+        // P(t) = Po + t*dr -> Pj = Po + t*dr -> Pj - C = Po + t*dr - C => Po - C + t*dr => w + t*dr
+
+        vector<float> w_esf = subt(olhoPintor, centroEsfera);
+
+        // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
+        float aDelta = prod_escalar(dr_u, dr_u);
+
+        float bDelta = 2 * prod_escalar(w_esf, dr_u);
+
+        float cDelta = prod_escalar(w_esf, w_esf) - pow(rEsfera, 2) ;
+
+        return {(pow(bDelta,2) - (4 * aDelta * cDelta)), aDelta, bDelta};
 }
 
 int main() {
@@ -183,6 +296,8 @@ int main() {
 
     /* ============= PERCORRER QUADRANTES DA TELA DE MOSQUITO ============= */
     float z = -dJanela;
+
+    Cilindro* cilindro = cria_cilindro(centroEsfera, rEsfera);
     for (int l = 0; l < nLin; l++) {
         float y = (hJanela/2) - (Dy/2) - l*Dy;
 
@@ -199,29 +314,68 @@ int main() {
             float dr_norma = norma(dr);
             vector<float> dr_u = div_escalar(dr, dr_norma);
 
-            /* ============= VERIFICAÇÃO PARA ESFERA ============= */
-            // De acordo com o processo matemático calculado, criamos o vetor w, que corresponde ao ponto olhoPintor - centroEsfera
-            // P(t) = Po + t*dr -> Pj = Po + t*dr -> Pj - C = Po + t*dr - C => Po - C + t*dr => w + t*dr
 
-            vector<float> w_esf = subt(olhoPintor, centroEsfera);
+            auto EsferaStruct = calcula_delta_esf(x, y, z, dr_u, olhoPintor, centroEsfera, rEsfera);
 
-            // Com o w podemos calcular os componentes a, b e c da nossa equação do segundo grau
-            float aDelta = prod_escalar(dr_u, dr_u);
+            auto Cstruct = gera_cilindro(cilindro, dr_u, olhoPintor);
 
-            float bDelta = 2 * prod_escalar(w_esf, dr_u);
+            
+            
+            float tEsf = INFINITY;
+            float tCil = INFINITY;
+            float t1, t2, t1Cil, t2Cil, t;
 
-            float cDelta = prod_escalar(w_esf, w_esf) - pow(rEsfera, 2) ;
+        /* ============= VERIFICAÇÃO PARA PLANO CHÃO ============= */
+            float ti_p_c = calcula_ti_plano(olhoPintor, P_pi_c, n_bar_c, dr_u);
 
-            float delta = pow(bDelta,2) - (4 * aDelta * cDelta);
+            /* ============= VERIFICAÇÃO PARA PLANO FUNDO ============= */
+            float ti_p_f = calcula_ti_plano(olhoPintor, P_pi_f, n_bar_f, dr_u);
+
+
+            // calcular menor valor de t
+            if (EsferaStruct.delta >= 0) {
+                t1 = (- EsferaStruct.bDelta + sqrt(EsferaStruct.delta))/(2.0f * EsferaStruct.aDelta);
+                t2 = (- EsferaStruct.bDelta - sqrt(EsferaStruct.delta))/(2.0f * EsferaStruct.aDelta);
+                if(t1 >= 0.0f && t2 >= 0.0f) tEsf = min(t1,t2);
+                else if(t1 > 0.0f) tEsf = t1;
+                else if(t2 > 0.0f) tEsf = t2;
+
+            }
+            if(Cstruct.delta >= 0){
+                t1Cil = (- Cstruct.bDelta + sqrt(Cstruct.delta))/Cstruct.aDelta;
+                t2Cil = (- Cstruct.bDelta - sqrt(Cstruct.delta))/Cstruct.aDelta;
+                if(t1Cil >= 0.0f && t2Cil >= 0.0f) tCil = min(t1Cil,t2Cil);
+                else if(t1Cil > 0.0f) tCil = t1Cil;
+                else if(t2Cil > 0.0f) tCil = t2Cil;
+
+                vector<float> dCil = cilindro->getDcil();
+                vector<float> centroCil = cilindro->getCentroCil();
+                float raioCil = cilindro->getRaioCil();
+                vector<float> Kcil = cilindro->getKaCil();
+                float alturaCil = cilindro->getAlturaCil();
+
+                // Calcula P(t) de acordo com a equação do Ray
+                vector<float> tdr = mult_escalar(dr_u, tCil);
+                vector<float> Pi = soma(olhoPintor, tdr);
+                vector<float> PiC = subt(Pi, centroCil);
+                float piC_dCil = prod_escalar(PiC, dCil);
+
+                if(piC_dCil< 0 || piC_dCil> alturaCil){
+                    tCil = INFINITY;
+                }
+                
+            }
+
+            // float t = min({tEsf, ti_p_c, ti_p_f});
+            t = tEsf;
+            if(tCil > 0.0f && (tCil < t || t < 0.0f)) t = tCil;
+            if(ti_p_c > 0.0f && (ti_p_c < t || t < 0.0f)) t = ti_p_c;
+            if(ti_p_f > 0.0f && (ti_p_f < t || t < 0.0f)) t = ti_p_f;            
+            
 
             // Se o delta é positivo ou 0, encontramos a esfera, se não vamos testar para outros objetos utilizados na cena
-            if (delta >= 0) {
-                // calcular menor valor de t
-                float t1 = (- bDelta + sqrt(delta))/2 * aDelta;
-                float t2 = (- bDelta - sqrt(delta))/2 * aDelta;
-
-                float t = minimo(t1, t2);
-
+            if (t == tEsf) {
+               
                 /* Calcular vetores n, l, v e r */
 
                 // Calcula P(t) de acordo com a equação do Ray
@@ -266,18 +420,83 @@ int main() {
                 fp.put(I_E[1] * 255);
                 fp.put(I_E[2] * 255);
 
-            } else {
-                /* ============= VERIFICAÇÃO PARA PLANO CHÃO ============= */
-                float ti_p_c = calcula_ti_plano(olhoPintor, P_pi_c, n_bar_c, dr_u);
 
-                /* ============= VERIFICAÇÃO PARA PLANO FUNDO ============= */
-                float ti_p_f = calcula_ti_plano(olhoPintor, P_pi_f, n_bar_f, dr_u);
+            }
 
+            else if(t == tCil){
+
+  
+                vector<float> dCil = cilindro->getDcil();
+                vector<float> centroCil = cilindro->getCentroCil();
+                vector<float> Kcil = cilindro->getKaCil();
+
+                /* Calcular vetores n, l, v e r */
+
+                // Calcula P(t) de acordo com a equação do Ray
+                vector<float> tdr = mult_escalar(dr_u, t);
+                vector<float> Pi = soma(olhoPintor, tdr);
+        
+                vector<float> PiC = subt(Pi, centroCil);
+
+                float proj = prod_escalar(PiC, dCil);
+                vector<float> proj_d = mult_escalar(dCil, proj);
+
+                // Componente perpendicular ao eixo
+                vector<float> n_temp = subt(PiC, proj_d);
+
+                // Normal do cilindro
+                vector<float> n = div_escalar(n_temp, norma(n_temp));
+
+                // Calcula l
+                vector<float> pfPI = subt(fonte_p_coord, Pi);
+                float pfPI_norma = norma(pfPI);
+                vector<float> l = div_escalar(pfPI, pfPI_norma);
+
+                // Calcula x
+                vector<float> x = {-dr_u[0], -dr_u[1], -dr_u[2]};
+
+                // Calcula r
+                float ln = prod_escalar(l, n);
+                vector<float> r = {(2*ln*n[0]) - l[0], (2*ln*n[1]) - l[1], (2 * ln*n[2]) - l[2]};
+
+                // Calcular Id e Ie e Iamb
+                float ln_limitado = max(0.0f, prod_escalar(l, n));
+                vector<float> Ifk = arroba(fonte_p_int, Kcil);
+                vector<float> Id = mult_escalar(Ifk, ln_limitado);
+
+                float rx = max(0.0f, prod_escalar(r, x));
+                float rxm = pow(rx, m_esf);
+                vector<float> Ie = mult_escalar(Ifk, rxm);
+
+                vector<float> Iamb = arroba(I_A, Kcil);
+
+                vector<float> I_E = {Ie[0] + Id[0] + Iamb[0], Ie[1] + Id[1] + Iamb[1], Ie[2] + Id[2] + Iamb[2]};
+
+                // Imprimir as cores no arquivo
+                if (I_E[0] > 1.0f){
+                    fp.put(255);
+                } else{
+                    fp.put(I_E[0] * 255);
+                }
+                fp.put(I_E[1] * 255);
+                fp.put(I_E[2] * 255);
+                               
+           }
+            
+            else {
+                
                 if (ti_p_c <= ti_p_f && ti_p_c > 0) {
                     vector<float> l;
-                    float delta = calcula_delta_plano(&l,dr_u, ti_p_c, olhoPintor, fonte_p_coord, centroEsfera, rEsfera);
 
-                    if (delta >= 0) {
+                    float delta = calcula_delta_plano(&l,dr_u, ti_p_c, olhoPintor, fonte_p_coord, centroEsfera, rEsfera, cilindro);
+
+                     // Calcula P(t) de acordo com a equação do Ray para a Esfera
+                    vector<float> tdr = mult_escalar(dr_u, ti_p_c);
+                    vector<float> Pi = soma(olhoPintor, tdr);
+
+                    float deltaCil= verifica_sombra_cilindro(cilindro, l, Pi, fonte_p_coord, ti_p_c);
+
+                    if (delta >= 0 || deltaCil >= 0) {
                        l = criarVetor(0.0f, 0.0f, 0.0f);
                     }
 
@@ -303,10 +522,22 @@ int main() {
                 } else if (ti_p_f > 0) {
                     vector<float> l;
 
-                    float delta = calcula_delta_plano(&l,dr_u, ti_p_f, olhoPintor, fonte_p_coord, centroEsfera, rEsfera);
+                    float delta = calcula_delta_plano(&l,dr_u, ti_p_f, olhoPintor, fonte_p_coord, centroEsfera, rEsfera, cilindro);
 
-                    if (delta >= 0) {
-                        l = criarVetor(0.0f, 0.0f, 0.0f);
+                    
+                    // Calcula P(t) de acordo com a equação do Ray para a Esfera
+                    vector<float> tdr = mult_escalar(dr_u, ti_p_f);
+                    vector<float> Pi = soma(olhoPintor, tdr);
+
+                    // Calcula P(t) de acordo com a equação do Ray para o cilindro
+                    vector<float> pfPI = subt(fonte_p_coord, Pi);
+                    float pfPI_norma = norma(pfPI);
+                    l = div_escalar(pfPI, pfPI_norma);
+
+                    float deltaCil= verifica_sombra_cilindro(cilindro, l, Pi, fonte_p_coord, ti_p_f);
+
+                    if (delta >= 0 || deltaCil >= 0) {
+                       l = criarVetor(0.0f, 0.0f, 0.0f);
                     }
 
                     vector<float> I_E_f = calcular_intensidade_olho(dr_u, l, n_bar_f, fonte_p_int, Kd_f, Ke_f, m_f, I_A); 
