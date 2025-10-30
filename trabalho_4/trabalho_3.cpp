@@ -2,69 +2,19 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include "utils.hpp"
+#include "cone.hpp"
+#include "fonteLuz.hpp"
 
 using namespace std;
 
 /* ============= FUNÇÕES ============= */
-
-vector<float> criarPonto( float x, float y, float z){
-    vector<float> p = {x,y,z,1};
-    return p;
-}
-
-vector<float> criarVetor(float x, float y, float z){
-    vector<float> v {x,y,z,0};
-    return v;
-}
-
-float norma(vector<float>& v){
-    return sqrt(pow(v[0],2) + pow(v[1],2) + pow(v[2],2));
-}
-
-float prod_escalar(vector<float>& v, vector<float>& p){
-    return (v[0] * p[0]) + (v[1] * p[1]) + (v[2] * p[2]);
-}
-
-vector<float> mult_escalar(vector<float>& v, float x) {
-    vector<float> q;
-    if (v[3] == 1)
-        q = criarPonto(v[0] * x, v[1] * x, v[2] * x);
-    else
-        q = criarVetor(v[0] * x, v[1] * x, v[2] * x);
-
-    return q;
-}
-
-vector<float> soma(vector<float>& v, vector<float>& p) {
-    vector<float> s = criarPonto(v[0] + p[0], v[1] + p[1], v[2] + p[2]);
-    return s;
-}
-
-vector<float> subt(vector<float>& v, vector<float>& p) {
-    vector<float> s = criarVetor(v[0] - p[0], v[1] - p[1], v[2] - p[2]);
-    return s;
-}
-
-vector<float> div_escalar(vector<float>& v, float x) {
-    vector<float> d;
-    if (v[3] == 1)
-        d = criarPonto(v[0]/x, v[1]/x, v[2]/x);
-    else
-        d = criarVetor(v[0]/x, v[1]/x, v[2]/x);
-
-    return d;
-}
 
 float calcula_ti_plano(vector<float> olhoPintor, vector<float> P_pi, vector<float> n_bar, vector<float> dr_u){
     vector<float> w_p = subt(olhoPintor, P_pi);
     float wpcn = - prod_escalar(w_p, n_bar);
     float drn = prod_escalar(dr_u, n_bar);
     return wpcn /drn;
-}
-
-vector<float> arroba(vector<float>& v, vector<float>& p) {
-    vector<float> arr = criarVetor(v[0] * p[0], v[1] * p[1], v[2] * p[2]);
-    return arr;
 }
 
 vector<float> calcular_intensidade_olho(vector<float> dr_u, vector<float> l, vector<float> n_bar, vector<float> fonte_p_int, vector<float> Kd, vector<float> Ke, float m, vector<float> I_A){
@@ -113,34 +63,6 @@ float calcula_delta_plano(vector<float>*l, vector<float> dr_u, float ti_p, vecto
     return pow(bDelta,2) - (4 * aDelta * cDelta);
 }
 
-float calcula_intersecao_cone(vector<float>& olhoPintor, vector<float>& dr_u, vector<float>& V, vector<float>& n, float H, float R, float cosTheta) {
-    vector<float> v = subt(olhoPintor, V);  // Ponto de origem do raio - Vértice do cone
-
-    float a = pow(prod_escalar(dr_u, n),2) - (prod_escalar(dr_u, dr_u)*cosTheta*cosTheta);
-    float b = prod_escalar(v, dr_u)*cosTheta*cosTheta - (prod_escalar(v,n)*prod_escalar(dr_u, n));
-    float c = pow(prod_escalar(v, n),2) - (prod_escalar(v, v)*cosTheta*cosTheta);
-
-    float delta = b * b - a * c;
-
-    if (delta < 0) {
-        return -1;  // Não há interseção
-    }
-
-    // Calculando o menor valor de t (pode ser uma interseção no cone)
-    float t1 = (-b + sqrt(delta)) / a;
-    float t2 = (-b - sqrt(delta)) / a;
-
-    return min(t1, t2);
-}
-
-float minimo(float x, float y) {
-    if (x <= y) {
-        return x;
-    } else {
-        return y;
-    }
-}
-
 int main() {
 
     // Localização do olho do Pintor
@@ -167,6 +89,8 @@ int main() {
 
     // Definir características da Fonte Ambiente
     vector<float> I_A = criarVetor(0.3f, 0.3f, 0.3f);
+
+    Luz fonte(fonte_p_int, fonte_p_coord, I_A);
 
     /* ============= OBJETOS DA CENA ============= */
     // Iniciar Esfera
@@ -214,23 +138,7 @@ int main() {
     vector<float> Ka_cone = criarVetor(0.8f, 0.3f, 0.2f);
     float m_cone = 1.0f;
 
-    // Nos cálculos de interseção vamos precisar do valor de Cos(T) em que T é o angulo que a geratriz faz com o eixo do cone. Vamos definir essas variáveis também para facilitar cálculos seguintes.
-    // Para calcular o vetor geratriz, vamos fazer a diferença entre um ponto na circunferência da base do cone e o vértice do cone.
-    // Para calcular o ponto na circunferencia da base do cone, vamos pegar o ponto do centro da base do cone e somar com o raio - seguindo o pensamento de que P - CB = r
-    vector<float> ortogonal = criarVetor(1.0f, 1.0f, 0.0f);
-    float ortogonal_norma = norma(ortogonal);
-    vector<float> ortogonal_u = div_escalar(ortogonal, ortogonal_norma);
-
-    vector<float> Circ_cone = criarPonto(CB_cone[0] + rB_cone*ortogonal_u[0], CB_cone[1] + rB_cone*ortogonal_u[1], CB_cone[2] + rB_cone*ortogonal_u[2]);
-    vector<float> g_cone = subt(Circ_cone, V_cone);
-    float g_cone_norma = norma(g_cone);
-    vector<float> g_cone_u = div_escalar(g_cone, g_cone_norma);
-    // Vamos calcular o vetor que sai do vértice e vai para o centro da base (o eixo) - pois o vetor d_cone já está normalizado
-    vector<float> eixo_cone = subt(CB_cone, V_cone);
-    float eixo_cone_norma = norma(eixo_cone);
-    vector<float> ex_cone_u = div_escalar(eixo_cone, eixo_cone_norma);
-    // Calculamos o cos(T) com o produto escalar dos vetores normalizados
-    float cosT = prod_escalar(g_cone_u, ex_cone_u);
+    Cone* cone = new Cone(rB_cone, h_cone, m_cone, CB_cone, d_cone, Kd_cone, Ke_cone, Ka_cone, true);
 
 
     /* ============= ARQUIVO PPM - Cabeçalho ============= */
@@ -325,82 +233,9 @@ int main() {
 
             } else {
                 /* ============= VERIFICAÇÃO PARA CONE ============= */
-                // De acordo com as equações do cone também vamos calcular o vetor v_cone = V - Po
-                vector<float> v_cone = subt(V_cone, olhoPintor);
-
-                float a_cone = prod_escalar(dr_u, d_cone)*prod_escalar(dr_u, d_cone) - prod_escalar(dr_u, dr_u)*cosT*cosT;
-                float b_cone = prod_escalar(v_cone, dr_u)*cosT*cosT - prod_escalar(v_cone, d_cone)*prod_escalar(dr_u, d_cone);
-                float c_cone = prod_escalar(v_cone, d_cone)*prod_escalar(v_cone, d_cone) - prod_escalar(v_cone, v_cone)*cosT*cosT;
-
-                float tEscolhido = 100.0f;
-                bool intersecao = false;
-
-                if (a_cone == 0 && b_cone!= 0) {
-                    float t_cone = -c_cone/(2.0f * b_cone);
-
-                    if (t_cone > 0.0001f) {
-                        vector<float> tdr = mult_escalar(dr_u, t_cone);
-                        vector<float> Pi = soma(olhoPintor, tdr);
-
-                        vector<float> VPi = subt(V_cone, Pi);
-                        float eqCone = prod_escalar(VPi, d_cone);
-
-                        if (eqCone >= 0 && eqCone <= h_cone) {
-                            intersecao = true;
-                            tEscolhido = minimo(t_cone, tEscolhido);
-                        }
-                    }
-                }
-
-                float delta_cone = b_cone * b_cone - a_cone * c_cone;
-
-                if (delta_cone >= 0) {
-                    float t1 = (-b_cone + (sqrt(delta_cone)))/(a_cone);
-                    float t2 = (-b_cone - (sqrt(delta_cone)))/(a_cone);
-
-                    for (float ti : {t1, t2}) {
-                        if (ti > 0.0001f) {
-                            vector<float> tdr = mult_escalar(dr_u, ti);
-                            vector<float> Pi = soma(olhoPintor, tdr);
-                            vector<float> VPi = subt(V_cone, Pi);
-                            float eqCone = prod_escalar(VPi, d_cone);
-
-                            if (eqCone >= 0 && eqCone <= h_cone) {
-                                intersecao = true;
-                                tEscolhido = minimo(ti, tEscolhido);
-                            }
-                        }
-                    }
-                }
-
-                if ( prod_escalar(dr_u, d_cone) != 0 ) {
-                    vector<float> PoCb = subt(olhoPintor, CB_cone);
-                    float t_base = -(prod_escalar(PoCb,d_cone)/ prod_escalar(dr_u,d_cone));
-
-                    if (t_base > 0.0001f) {
-                        vector<float> tdr = mult_escalar(dr_u, t_base);
-                        vector<float> Pi = soma(olhoPintor, tdr);
-
-                        vector<float> PiCB = subt(Pi, CB_cone);
-
-                        if (prod_escalar(PiCB, PiCB) <= rB_cone*rB_cone) {
-                            intersecao = true;
-                            tEscolhido = minimo(t_base, tEscolhido);
-                        }
-                    }
-                }
-
-                if (intersecao) {
-                    vector<float> tdr = mult_escalar(dr_u, tEscolhido);
-                    vector<float> Pi = soma(olhoPintor, tdr);
-
-                    // Calcula l
-                    vector<float> pfPI = subt(fonte_p_coord, Pi);
-                    float pfPI_norma = norma(pfPI);
-                    vector<float> l_cone = div_escalar(pfPI, pfPI_norma);
-
-                    vector<float> I_E_cone = calcular_intensidade_olho(dr_u, l_cone,d_cone,fonte_p_int,Kd_cone, Ke_cone, m_cone, I_A);
-
+                vector<float> I_E_cone = cone->calculaIntersecao(olhoPintor, dr_u, fonte);
+                
+                if (I_E_cone[0] != -1) {
                     // Imprimir as cores no arquivo
                     if (I_E_cone[0] > 1.0f){
                         fp.put(255);
