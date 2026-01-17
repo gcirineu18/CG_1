@@ -3,10 +3,14 @@
 
 #include "vec3.hpp"
 
+class Texture;
+
 struct Material {
     Vec3 color;
     double kd, ks, ka;
     double shininess;
+    bool useTexture = false;
+    Texture* texture = nullptr;
 };
 
 struct HitRecord {
@@ -15,6 +19,7 @@ struct HitRecord {
     Vec3 normal;      // Vetor normal
     int objectID;
     Material mat;
+    double u, v;      // coordenadas de textura  
 };
 
 #endif

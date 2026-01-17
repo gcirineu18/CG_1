@@ -32,6 +32,10 @@ public:
                 rec.normal = n_bar * -1.0f;
             }
 
+            // Calcular coordenadas UV para textura
+            rec.u = rec.p.x;
+            rec.v = rec.p.z;
+
             rec.objectID = id;
             rec.mat = mat;
             return true;
