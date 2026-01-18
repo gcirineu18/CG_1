@@ -93,6 +93,68 @@ public:
         return false;
     }
 
+    void rotateX(double angle){
+        cBase = cBase.rotX(angle);
+        V = V.rotX(angle);
+        n = (V - cBase).normalize();
+        // recalcular ângulo de abertura do cone
+        theta = std::atan2(raio, H);
+    }
+
+    void rotateY(double angle){
+        cBase = cBase.rotY(angle);
+        V = V.rotY(angle);
+        n = (V - cBase).normalize();
+        theta = std::atan2(raio, H);
+    }
+
+    void rotateZ(double angle){
+        cBase = cBase.rotZ(angle);
+        V = V.rotZ(angle);
+        n = (V - cBase).normalize();
+        theta = std::atan2(raio, H);
+    }
+
+    void translate( double tx, double ty, double tz){
+        cBase = cBase.translate(tx, ty, tz);
+        V = V.translate(tx, ty, tz);
+    }
+
+    void translate(const Vec3& t){
+        translate(t.x, t.y, t.z);
+    }
+
+    void scaleTransform(double sx, double sy, double sz) {
+        // Transformar base e vértice
+        cBase = cBase.scale(sx, sy, sz);
+        V = V.scale(sx, sy, sz);
+        
+        // Recalcular direção e altura
+        Vec3 newDir = V - cBase;
+        H = newDir.length();
+        n = newDir.normalize();
+        
+        // O raio também precisa ser escalado
+        raio = raio * sqrt(sx * sx + sz * sz) / 2.0;  // média das escalas perpendiculares
+        theta = std::atan2(raio, H);
+    }
+
+    void scaleTransform(double s) {
+        scaleTransform(s, s, s);
+    }
+
+    void shearTransform(double xy, double xz, double yx, double yz, double zx, double zy) {
+        cBase = cBase.shear(xy, xz, yx, yz, zx, zy);
+        V = V.shear(xy, xz, yx, yz, zx, zy);
+        
+        // Recalcular direção e altura
+        Vec3 newDir = V - cBase;
+        H = newDir.length();
+        n = newDir.normalize();
+        theta = std::atan2(raio, H);
+    }
+
+
 private:
     void hitLateral(HitRecord& rec, const Ray& r, double t){
         rec.t = t;

@@ -14,6 +14,8 @@
 #include "textura.hpp"
 #include "cube.hpp"
 
+#define M_PI 3.14159265358979323846
+
 // Função para limitar os valores entre 0 e 1
 double clamp(double x) {
     if (x < 0) return 0;
@@ -83,12 +85,66 @@ int main() {
     Material esf = {Vec3(1.0, 0.73, 0.37), 0.854, 0.647, 0.125, 2.0};
     Material cubo_mat = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift};  
     Material cubo_mat2 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift2};  
-    Material cubo_mat3 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift3};  
+    Material cubo_mat3 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift3}; 
+   
+    
+    Cube* cube1 = new Cube(Vec3(0, -1.3,-1.4), 0.5, cubo_mat, 9);
+    cube1->rotateY(M_PI / 4);
+    cube1->translate(0.2,0,0);
+
+    Cube* cube2 = new Cube(Vec3(-0.9, -1.3,-1.289), 0.5, cubo_mat3, 11);
+    cube2->scaleTransform(1.5, 1.0, 1.0);
+    cube2->rotateY(M_PI / 4);
+
+    Cube* cube3 = new Cube(Vec3(0.6, -1.3,-1.2), 0.5, cubo_mat2, 10);
+    cube3->scaleTransform(1.5, 1.0, 1.0);
+
+
+    Cone* cone = new Cone(Vec3(-0.9, -1.3,-0.9), Vec3(0,1,0), 0.9, 1.5, con, 7);
+
+    
+    cone->rotateX(M_PI); 
+
+    cone->scaleTransform(0.1, 0.1, 0.1);
+
+
+   // cone->shearTransform(0.3, 0, 0, 0, 0, 0);  
+
+
+    Material prateleira = {Vec3(0.55, 0.27, 0.07), 0.3, 0.7, 0.2, 10.0, false, nullptr}; // Cor marrom madeira
+    Material decoracao1 = {Vec3(0.8, 0.1, 0.1), 0.2, 0.8, 0.5, 32.0};  // Vermelho brilhante
+    Material decoracao2 = {Vec3(0.2, 0.5, 0.9), 0.2, 0.8, 0.5, 32.0};  // Azul
+    Material decoracao3 = {Vec3(0.9, 0.8, 0.1), 0.2, 0.8, 0.6, 64.0};  // Dourado
+
+    Cube* prateleira1 = new Cube(Vec3(1.7, -0.5,-1.7), 0.3, prateleira, 12);
+    prateleira1->scaleTransform(1.23, 0.3, 4.0);  
+
+    Cube* prateleira2 = new Cube(Vec3(1.7, -0.2,-1.7), 0.3, prateleira, 13);
+    prateleira2->scaleTransform(1.23, 0.3, 4.0); 
+    
+
+    Cone* coneDec1 = new Cone(Vec3(1.65, -0.15, -1.7), Vec3(0,1,0), 0.5, 0.8, decoracao1, 14);
+
+    Cone* coneDec2 = new Cone(Vec3(1.65, -0.15, -1.7), Vec3(0,1,0), 0.5, 0.8, decoracao1, 15);
+
+    coneDec1->scaleTransform(0.1, 0.1, 0.1);
+    coneDec1->translate(0.37, -0.036, 0.4);
+    
+    coneDec2->scaleTransform(0.07, 0.07, 0.07);
+    coneDec2->rotateX(M_PI);
+    coneDec2->translate(0.185, 0.05, 0.45);
 
     Cena cena;
-    cena.adicionar(new Cube(Vec3(0, -1.3,-1.4), 0.5, cubo_mat, 9));
-    cena.adicionar(new Cube(Vec3(0.4, -1.3,-1.2), 0.5, cubo_mat2, 10));
-    cena.adicionar(new Cube(Vec3(-0.5, -1.3,-1.289), 0.5, cubo_mat3, 11));
+        
+
+    cena.adicionar(prateleira1);
+    cena.adicionar(prateleira2);
+    cena.adicionar(coneDec1);
+    cena.adicionar(coneDec2);
+
+    cena.adicionar(cube1);
+    cena.adicionar(cube3);
+    cena.adicionar(cube2);
 
     cena.adicionar(new Plane(Vec3(0,-1.5,0),Vec3(0,1,0),chao,1));
     cena.adicionar(new Plane(Vec3(2,-1.5,0),Vec3(-1,0,0),parede,2));
