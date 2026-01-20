@@ -13,6 +13,8 @@ public:
     float size;
     std::vector<Triangle> triangles;
 
+    Vec3 vertices[8];
+
     // Construtor: posição e tamanho do cubo
     Cube(Vec3 center, float size, Material m, int _id) {
         mat = m;
@@ -25,46 +27,99 @@ public:
         min_corner = center - Vec3(half, half, half);
         max_corner = center + Vec3(half, half, half);
 
+        initializeVertices();
         createMesh(m, _id);
     }
 
-    void createMesh(Material m, int _id) {
+    // ADICIONAR: Inicializar vértices no estado original
+    void initializeVertices() {
+        float half = size / 3.0f;
+        vertices[0] = Vec3(-half, -half, -half);
+        vertices[1] = Vec3( half, -half, -half);
+        vertices[2] = Vec3( half,  half, -half);
+        vertices[3] = Vec3(-half,  half, -half);
+        vertices[4] = Vec3(-half, -half,  half);
+        vertices[5] = Vec3( half, -half,  half);
+        vertices[6] = Vec3( half,  half,  half);
+        vertices[7] = Vec3(-half,  half,  half);
+    }
 
+    void createMesh(Material m, int _id) {
         triangles.clear();
 
-        // Define os 8 vértices do cubo
-        Vec3 v0 = Vec3(min_corner.x, min_corner.y, min_corner.z);
-        Vec3 v1 = Vec3(max_corner.x, min_corner.y, min_corner.z);
-        Vec3 v2 = Vec3(max_corner.x, max_corner.y, min_corner.z);
-        Vec3 v3 = Vec3(min_corner.x, max_corner.y, min_corner.z);
-        Vec3 v4 = Vec3(min_corner.x, min_corner.y, max_corner.z);
-        Vec3 v5 = Vec3(max_corner.x, min_corner.y, max_corner.z);
-        Vec3 v6 = Vec3(max_corner.x, max_corner.y, max_corner.z);
-        Vec3 v7 = Vec3(min_corner.x, max_corner.y, max_corner.z);
+        // Usar vértices armazenados + centro
+        Vec3 v0 = vertices[0] + center;
+        Vec3 v1 = vertices[1] + center;
+        Vec3 v2 = vertices[2] + center;
+        Vec3 v3 = vertices[3] + center;
+        Vec3 v4 = vertices[4] + center;
+        Vec3 v5 = vertices[5] + center;
+        Vec3 v6 = vertices[6] + center;
+        Vec3 v7 = vertices[7] + center;
 
-        // Face frontal (z mínimo) - 2 triângulos
+        // Faces (igual antes)
         triangles.push_back(Triangle(v0, v1, v2, m, _id));
         triangles.push_back(Triangle(v0, v2, v3, m, _id));
-
-        // Face traseira (z máximo) - 2 triângulos
         triangles.push_back(Triangle(v5, v4, v7, m, _id));
         triangles.push_back(Triangle(v5, v7, v6, m, _id));
-
-        // Face esquerda (x mínimo) - 2 triângulos
         triangles.push_back(Triangle(v4, v0, v3, m, _id));
         triangles.push_back(Triangle(v4, v3, v7, m, _id));
-
-        // Face direita (x máximo) - 2 triângulos
         triangles.push_back(Triangle(v1, v5, v6, m, _id));
         triangles.push_back(Triangle(v1, v6, v2, m, _id));
-
-        // Face inferior (y mínimo) - 2 triângulos
         triangles.push_back(Triangle(v4, v5, v1, m, _id));
         triangles.push_back(Triangle(v4, v1, v0, m, _id));
-
-        // Face superior (y máximo) - 2 triângulos
         triangles.push_back(Triangle(v3, v2, v6, m, _id));
         triangles.push_back(Triangle(v3, v6, v7, m, _id));
+    }
+
+    void rotateY(double angle) {
+        for (int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].rotY(angle);
+        }
+        createMesh(mat, id);
+    }
+
+    void rotateX(double angle) {
+        for (int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].rotX(angle);
+        }
+        createMesh(mat, id);
+    }
+
+    void rotateZ(double angle) {
+        for (int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].rotZ(angle);
+        }
+        createMesh(mat, id);
+    }
+
+    void scaleTransform(double sx, double sy, double sz) {
+        for (int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].scale(sx, sy, sz);
+        }
+        createMesh(mat, id);
+    }
+
+    void scaleTransform(double s) {
+        scaleTransform(s, s, s);
+    }
+
+    void shearTransform(double xy, double xz, double yx, double yz, double zx, double zy) {
+        for (int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].shear(xy, xz, yx, yz, zx, zy);
+        }
+        createMesh(mat, id);
+    }
+
+    void translate(double tx, double ty, double tz) {
+        center = center.translate(tx, ty, tz);
+        min_corner = min_corner.translate(tx, ty, tz);
+        max_corner = max_corner.translate(tx, ty, tz);
+        createMesh(mat, id);
+    }
+
+    void translate(const Vec3& t) {
+        translate(t.x, t.y, t.z);
     }
 
     bool intersect(const Ray& r, HitRecord& rec) override {
@@ -85,100 +140,7 @@ public:
         return hit;
     }
 
-    void rotateX(double angle){
-        float half = size / 3.0f;
-
-        // Calcular os 8 vértices relativos ao centro
-        Vec3 v0 = Vec3(-half, -half, -half).rotX(angle);
-        Vec3 v1 = Vec3( half, -half, -half).rotX(angle);
-        Vec3 v2 = Vec3( half,  half, -half).rotX(angle);
-        Vec3 v3 = Vec3(-half,  half, -half).rotX(angle);
-        Vec3 v4 = Vec3(-half, -half,  half).rotX(angle);
-        Vec3 v5 = Vec3( half, -half,  half).rotX(angle);
-        Vec3 v6 = Vec3( half,  half,  half).rotX(angle);
-        Vec3 v7 = Vec3(-half,  half,  half).rotX(angle);
-
-        updateMeshWithVertices(v0, v1, v2, v3, v4, v5, v6, v7);
-    }
-
-    void rotateY(double angle) {
-        float half = size / 3.0f;
-        
-        Vec3 v0 = Vec3(-half, -half, -half).rotY(angle);
-        Vec3 v1 = Vec3( half, -half, -half).rotY(angle);
-        Vec3 v2 = Vec3( half,  half, -half).rotY(angle);
-        Vec3 v3 = Vec3(-half,  half, -half).rotY(angle);
-        Vec3 v4 = Vec3(-half, -half,  half).rotY(angle);
-        Vec3 v5 = Vec3( half, -half,  half).rotY(angle);
-        Vec3 v6 = Vec3( half,  half,  half).rotY(angle);
-        Vec3 v7 = Vec3(-half,  half,  half).rotY(angle);
-
-        updateMeshWithVertices(v0, v1, v2, v3, v4, v5, v6, v7);
-    }
-    
-    void rotateZ(double angle) {
-        float half = size / 3.0f;
-        
-        Vec3 v0 = Vec3(-half, -half, -half).rotZ(angle);
-        Vec3 v1 = Vec3( half, -half, -half).rotZ(angle);
-        Vec3 v2 = Vec3( half,  half, -half).rotZ(angle);
-        Vec3 v3 = Vec3(-half,  half, -half).rotZ(angle);
-        Vec3 v4 = Vec3(-half, -half,  half).rotZ(angle);
-        Vec3 v5 = Vec3( half, -half,  half).rotZ(angle);
-        Vec3 v6 = Vec3( half,  half,  half).rotZ(angle);
-        Vec3 v7 = Vec3(-half,  half,  half).rotZ(angle);
-
-        updateMeshWithVertices(v0, v1, v2, v3, v4, v5, v6, v7);
-    }
-
-    // Translação
-    void translate(double tx, double ty, double tz) {
-        center = center.translate(tx, ty, tz);
-        min_corner = min_corner.translate(tx, ty, tz);
-        max_corner = max_corner.translate(tx, ty, tz);
-        createMesh(mat, id);
-    }
-
-    void translate(const Vec3& t) {
-        translate(t.x, t.y, t.z);
-    }
-
-    // Escala
-    void scaleTransform(double sx, double sy, double sz) {
-        float half = size / 3.0f;
-        
-        Vec3 v0 = Vec3(-half, -half, -half).scale(sx, sy, sz);
-        Vec3 v1 = Vec3( half, -half, -half).scale(sx, sy, sz);
-        Vec3 v2 = Vec3( half,  half, -half).scale(sx, sy, sz);
-        Vec3 v3 = Vec3(-half,  half, -half).scale(sx, sy, sz);
-        Vec3 v4 = Vec3(-half, -half,  half).scale(sx, sy, sz);
-        Vec3 v5 = Vec3( half, -half,  half).scale(sx, sy, sz);
-        Vec3 v6 = Vec3( half,  half,  half).scale(sx, sy, sz);
-        Vec3 v7 = Vec3(-half,  half,  half).scale(sx, sy, sz);
-
-        updateMeshWithVertices(v0, v1, v2, v3, v4, v5, v6, v7);
-    }
-
-    void scaleTransform(double s) {
-        scaleTransform(s, s, s);
-    }
-
-    // Cisalhamento
-    void shearTransform(double xy, double xz, double yx, double yz, double zx, double zy) {
-        float half = size / 3.0f;
-        
-        Vec3 v0 = Vec3(-half, -half, -half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v1 = Vec3( half, -half, -half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v2 = Vec3( half,  half, -half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v3 = Vec3(-half,  half, -half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v4 = Vec3(-half, -half,  half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v5 = Vec3( half, -half,  half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v6 = Vec3( half,  half,  half).shear(xy, xz, yx, yz, zx, zy);
-        Vec3 v7 = Vec3(-half,  half,  half).shear(xy, xz, yx, yz, zx, zy);
-
-        updateMeshWithVertices(v0, v1, v2, v3, v4, v5, v6, v7);
-    }
-
+   
     private:
         void updateMeshWithVertices(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, 
             Vec3 v4, Vec3 v5, Vec3 v6, Vec3 v7)

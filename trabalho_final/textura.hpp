@@ -54,7 +54,7 @@ public:
         return true;
     }
 
-    // Amostrar cor da textura com coordenadas UV
+    // retornar a cor de um pixel da textura com coordenadas UV
     Vec3 sample(double u, double v) const {
         if (pixels.empty()) return Vec3(1, 0, 1); // Magenta se erro
         
@@ -68,6 +68,7 @@ public:
         i = std::max(0, std::min(width - 1, i));
         j = std::max(0, std::min(height - 1, j));
         
+        // Acessa o vetor 1D usando fórmula 2D
         return pixels[j * width + i];
     }
 };
