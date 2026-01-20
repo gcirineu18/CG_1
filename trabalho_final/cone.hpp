@@ -9,7 +9,7 @@ public:
     double raio, H, theta;
     bool base;
 
-    Cone(Vec3 base, Vec3 eixo, double r_param, double altura, Material m, int _id, bool baseOn = true) {
+    Cone(Vec3 base, Vec3 eixo, double r_param, double altura, Material m, bool baseOn = true, const char* nome = "") {
         cBase = base;
         n = eixo.normalize();
         raio = r_param;
@@ -17,8 +17,8 @@ public:
         theta = std::atan2(raio, altura);
         V = cBase + n * H;
         mat = m;
-        id = _id;
         base = baseOn;
+        name = nome;
     }
 
     float intersectBase(const Ray& r) {

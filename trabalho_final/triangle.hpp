@@ -9,10 +9,9 @@ public:
     Vec3 v0, v1, v2;  // Vértices do triângulo
     Vec3 normal;
 
-    Triangle(Vec3 _v0, Vec3 _v1, Vec3 _v2, Material m, int _id) 
-        : v0(_v0), v1(_v1), v2(_v2) {
+    Triangle(Vec3 _v0, Vec3 _v1, Vec3 _v2, Material m) 
+        :Object(false), v0(_v0), v1(_v1), v2(_v2) {
         mat = m;
-        id = _id;
         
         // Calcular normal usando produto cruzado
         Vec3 e1 = v1 - v0;

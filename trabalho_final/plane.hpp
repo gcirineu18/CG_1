@@ -8,11 +8,11 @@ public:
     Vec3 p_pi;
     Vec3 n_bar;
 
-    Plane(Vec3 p, Vec3 n, Material m, int _id){
+    Plane(Vec3 p, Vec3 n, Material m, const char* nome){
         p_pi = p;
         n_bar = n;
         mat = m;
-        id = _id;
+        name = nome;
     }
 
     bool intersect(const Ray& r, HitRecord& rec) override {

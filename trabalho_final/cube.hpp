@@ -16,9 +16,9 @@ public:
     Vec3 vertices[8];
 
     // Construtor: posição e tamanho do cubo
-    Cube(Vec3 center, float size, Material m, int _id) {
+    Cube(Vec3 center, float size, Material m, const char* nome) {
         mat = m;
-        id = _id;
+        name = nome;
 
         this->center = center;
         this->size = size;
@@ -28,7 +28,7 @@ public:
         max_corner = center + Vec3(half, half, half);
 
         initializeVertices();
-        createMesh(m, _id);
+        createMesh(m);
     }
 
     // ADICIONAR: Inicializar vértices no estado original
@@ -44,7 +44,7 @@ public:
         vertices[7] = Vec3(-half,  half,  half);
     }
 
-    void createMesh(Material m, int _id) {
+    void createMesh(Material m) {
         triangles.clear();
 
         // Usar vértices armazenados + centro
@@ -58,46 +58,46 @@ public:
         Vec3 v7 = vertices[7] + center;
 
         // Faces (igual antes)
-        triangles.push_back(Triangle(v0, v1, v2, m, _id));
-        triangles.push_back(Triangle(v0, v2, v3, m, _id));
-        triangles.push_back(Triangle(v5, v4, v7, m, _id));
-        triangles.push_back(Triangle(v5, v7, v6, m, _id));
-        triangles.push_back(Triangle(v4, v0, v3, m, _id));
-        triangles.push_back(Triangle(v4, v3, v7, m, _id));
-        triangles.push_back(Triangle(v1, v5, v6, m, _id));
-        triangles.push_back(Triangle(v1, v6, v2, m, _id));
-        triangles.push_back(Triangle(v4, v5, v1, m, _id));
-        triangles.push_back(Triangle(v4, v1, v0, m, _id));
-        triangles.push_back(Triangle(v3, v2, v6, m, _id));
-        triangles.push_back(Triangle(v3, v6, v7, m, _id));
+        triangles.push_back(Triangle(v0, v1, v2, m));
+        triangles.push_back(Triangle(v0, v2, v3, m));
+        triangles.push_back(Triangle(v5, v4, v7, m));
+        triangles.push_back(Triangle(v5, v7, v6, m));
+        triangles.push_back(Triangle(v4, v0, v3, m));
+        triangles.push_back(Triangle(v4, v3, v7, m));
+        triangles.push_back(Triangle(v1, v5, v6, m));
+        triangles.push_back(Triangle(v1, v6, v2, m));
+        triangles.push_back(Triangle(v4, v5, v1, m));
+        triangles.push_back(Triangle(v4, v1, v0, m));
+        triangles.push_back(Triangle(v3, v2, v6, m));
+        triangles.push_back(Triangle(v3, v6, v7, m));
     }
 
     void rotateY(double angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotY(angle);
         }
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void rotateX(double angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotX(angle);
         }
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void rotateZ(double angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotZ(angle);
         }
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void scaleTransform(double sx, double sy, double sz) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].scale(sx, sy, sz);
         }
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void scaleTransform(double s) {
@@ -108,14 +108,14 @@ public:
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].shear(xy, xz, yx, yz, zx, zy);
         }
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void translate(double tx, double ty, double tz) {
         center = center.translate(tx, ty, tz);
         min_corner = min_corner.translate(tx, ty, tz);
         max_corner = max_corner.translate(tx, ty, tz);
-        createMesh(mat, id);
+        createMesh(mat);
     }
 
     void translate(const Vec3& t) {
@@ -156,18 +156,18 @@ public:
             v6 = v6 + center;
             v7 = v7 + center;
 
-            triangles.push_back(Triangle(v0, v1, v2, mat, id));
-            triangles.push_back(Triangle(v0, v2, v3, mat, id));
-            triangles.push_back(Triangle(v5, v4, v7, mat, id));
-            triangles.push_back(Triangle(v5, v7, v6, mat, id));
-            triangles.push_back(Triangle(v4, v0, v3, mat, id));
-            triangles.push_back(Triangle(v4, v3, v7, mat, id));
-            triangles.push_back(Triangle(v1, v5, v6, mat, id));
-            triangles.push_back(Triangle(v1, v6, v2, mat, id));
-            triangles.push_back(Triangle(v4, v5, v1, mat, id));
-            triangles.push_back(Triangle(v4, v1, v0, mat, id));
-            triangles.push_back(Triangle(v3, v2, v6, mat, id));
-            triangles.push_back(Triangle(v3, v6, v7, mat, id));
+            triangles.push_back(Triangle(v0, v1, v2, mat));
+            triangles.push_back(Triangle(v0, v2, v3, mat));
+            triangles.push_back(Triangle(v5, v4, v7, mat));
+            triangles.push_back(Triangle(v5, v7, v6, mat));
+            triangles.push_back(Triangle(v4, v0, v3, mat));
+            triangles.push_back(Triangle(v4, v3, v7, mat));
+            triangles.push_back(Triangle(v1, v5, v6, mat));
+            triangles.push_back(Triangle(v1, v6, v2, mat));
+            triangles.push_back(Triangle(v4, v5, v1, mat));
+            triangles.push_back(Triangle(v4, v1, v0, mat));
+            triangles.push_back(Triangle(v3, v2, v6, mat));
+            triangles.push_back(Triangle(v3, v6, v7, mat));
 
         }
 

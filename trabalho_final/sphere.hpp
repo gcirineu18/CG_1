@@ -8,11 +8,11 @@ public:
     Vec3 centro;
     float raio;
 
-    Sphere(Vec3 c, float r, Material m, int _id){
+    Sphere(Vec3 c, float r, Material m, const char* nome){
         centro = c;
         raio = r;
         mat = m;
-        id = _id;
+        name = nome;
     }
 
     bool intersect(const Ray& r, HitRecord& rec) override {

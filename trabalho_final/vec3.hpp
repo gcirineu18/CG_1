@@ -16,8 +16,10 @@ struct Vec3 {
 
     Vec3 operator*(const Vec3& v) const { return {x * v.x, y * v.y, z * v.z}; }
 
+    //Produto escalar
     double dot(const Vec3& v) const { return x * v.x + y * v.y + z * v.z; }
 
+    //Produto vetorial
     Vec3 cross(const Vec3& v) const {
         return {y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x};
     }

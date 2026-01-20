@@ -12,15 +12,16 @@ public:
     bool tampaBase;
     bool tampaTopo;
 
-    Cylinder(Vec3 base, Vec3 d_eixo, float raio, float altura, Material m, int _id, bool baseOn = true, bool topoOn = true) {
+    Cylinder(Vec3 base, Vec3 d_eixo, float raio, float altura, Material m, 
+        bool baseOn = true, bool topoOn = true, const char* nome = "") {
         B = base;
         u = d_eixo.normalize();
         R = raio;
         H = altura;
         mat = m;
-        id = _id;
         tampaBase = baseOn;
         tampaTopo = topoOn;
+        name = nome;
     }
 
     bool intersect(const Ray& r, HitRecord& rec) override {
