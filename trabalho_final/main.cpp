@@ -13,6 +13,7 @@
 #include "light.hpp"
 #include "textura.hpp"
 #include "cube.hpp"
+#include "spotLight.hpp"
 using namespace std;
 
 #define M_PI 3.14159265358979323846
@@ -50,12 +51,18 @@ int main(int argc, char* argv[]) {
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-
-    Camera cam(Vec3(0, 0, 1),Vec3(0,0,1),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
+    //Camera cam(Vec3(0, 0, -0.5),Vec3(1.7, -0.5,-1.7),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
+    Camera cam(Vec3(0, 0, 1),Vec3(0, 0, 1),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
 
     std::vector<Light> luzes;
     luzes.push_back(Light(Vec3(-1,1.4,0.2),Vec3(0.7,0.7,0.7)));
-    
+    std::vector<SpotLight> spotLights;
+    spotLights.push_back(SpotLight(
+        Vec3(1.7, 1.4, -1.8),        
+        Vec3(1.0, 1.0, 0.8),          
+        Vec3(0, -1, 0).normalize(),               
+        M_PI / 8                    
+    )); 
     Texture* texturaMadeira = new Texture();
     Texture* paredeMadeira = new Texture();
     Texture* tetoTex = new Texture();
@@ -144,19 +151,20 @@ int main(int argc, char* argv[]) {
     movie3->shearTransform(0.3, 0, 0, 0, 0, 0); 
     
 
-    Cone* coneDec1 = new Cone(Vec3(1.65, -0.15, -1.7), Vec3(0,1,0), 0.5, 0.8, decoracao1, true, "ampulheta1");
+    Cone* coneDec1 = new Cone(Vec3(0, 0, 0), Vec3(0,1,0), 0.5, 0.8, decoracao1, true, "ampulheta1");
 
-    Cone* coneDec2 = new Cone(Vec3(1.65, -0.15, -1.7), Vec3(0,1,0), 0.4, 0.7, decoracao1, true, "ampulheta2");
+    Cone* coneDec2 = new Cone(Vec3(0, 0, 0), Vec3(0,1,0), 0.4, 0.7, decoracao1, true, "ampulheta2");
 
-    coneDec1->scaleTransform(0.1, 0.1, 0.1);
-    coneDec1->translate(0.37, -0.036, 0.4);
     
-    coneDec2->scaleTransform(0.07, 0.07, 0.07);
+    coneDec1->scaleTransform(0.3, 0.3, 0.3);
+    coneDec1->translate(1.67, -0.15, -1.48);
+    
+    coneDec2->scaleTransform(0.3, 0.3, 0.3);
     coneDec2->rotateX(M_PI);
-    coneDec2->translate(0.185, 0.036, 0.45);
+    coneDec2->translate(1.67, 0.18, -1.48);
 
-    Sphere* cristal = new Sphere(Vec3(1.5, -0.034, -1.58), 0.06, esf2, "cristal");
-    Cube* suporte = new Cube(Vec3(1.5, -0.121,-1.58), 0.3, suporte_esf, "suporte cristal");
+    Sphere* cristal = new Sphere(Vec3(1.67, -0.04, -1.78), 0.06, esf2, "cristal");
+    Cube* suporte = new Cube(Vec3(1.67, -0.131,-1.78), 0.3, suporte_esf, "suporte cristal");
     suporte->scaleTransform(1.0, 0.2, 1.0); 
 
     Cena cena;
@@ -165,8 +173,8 @@ int main(int argc, char* argv[]) {
     cena.adicionar(movie2);
     cena.adicionar(movie3);
         
-    cena.adicionar(cristal);
-    cena.adicionar(suporte);
+   cena.adicionar(cristal);
+   cena.adicionar(suporte);
 
     cena.adicionar(prateleira1);
     cena.adicionar(prateleira2);
@@ -207,40 +215,12 @@ int main(int argc, char* argv[]) {
             HitRecord hit;
             Vec3 corPixel;
 
-            if (cena.trace(r, hit)) {
-                Vec3 baseColor = hit.mat.color;
+            if (cena.trace(r, hit)) {               
                 
-                // Aplicar textura se disponível
-                if (hit.mat.useTexture && hit.mat.texture != nullptr) {
-                    baseColor = hit.mat.texture->sample(hit.u, hit.v);
-                }
-                
-                Vec3 corFinal = baseColor * hit.mat.ka;
+                Vec3 corLuzes = Light::calcula_luzes(luzes, hit, cena, cam);
+                Vec3 corSpot = SpotLight::calcula_luzSpot(spotLights, hit, cena, cam);
 
-                for (const auto& luz : luzes){
-                    Vec3 L = (luz.position - hit.p).normalize();
-                    double distL = (luz.position - hit.p).length();
-
-                    Ray shadowRay(hit.p + hit.normal * 0.01, L);
-                    HitRecord shadowHit;
-
-                    bool emSombra =  false;
-                    if (cena.trace(shadowRay, shadowHit)){
-                        if (shadowHit.objectID != hit.objectID && shadowHit.t < distL) emSombra = true;
-                    }
-
-                    if(!emSombra){
-                        double dotNL = std::max(0.0, hit.normal.dot(L));
-                        corFinal = corFinal + (baseColor * luz.color)* (hit.mat.kd * dotNL);
-
-                        Vec3 V_d = (cam.eye - hit.p).normalize();
-                        Vec3 R_d = (hit.normal * (2.0 * hit.normal.dot(L))) - L;
-                        double dotRV = std::max(0.0, R_d.dot(V_d));
-
-                        corFinal = corFinal + (luz.color) * (hit.mat.ks * std::pow(dotRV, hit.mat.shininess));
-                    }
-                }
-                corPixel = corFinal;
+                corPixel = corSpot + corLuzes;
 
             } else {
                 corPixel = cena.bg_color;

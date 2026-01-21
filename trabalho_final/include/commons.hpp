@@ -2,8 +2,9 @@
 #define COMMONS_HPP
 
 #include "vec3.hpp"
+#include "textura.hpp"
 
-class Texture;
+
 
 struct Material {
     Vec3 color;
