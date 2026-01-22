@@ -19,7 +19,7 @@ cd trabalho_final
 
 3. Digite o comando para compilar e executar:
 ```bash
-g++ main.cpp -o programa.exe -I.\include -L"C:\SDL2\lib" - lmingw32 - lSDL2main -lSDL2 -lSDL2_image && programa.exe
+g++ main.cpp -o programa.exe -I.\include -L"C:\SDL2\lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_image && programa.exe
 ```
 
 ou
