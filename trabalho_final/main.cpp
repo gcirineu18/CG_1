@@ -2,18 +2,18 @@
 #include <fstream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "vec3.hpp"
-#include "ray.hpp"
-#include "camera.hpp"
-#include "cena.hpp"
-#include "sphere.hpp"
-#include "plane.hpp"
-#include "cylinder.hpp"
-#include "cone.hpp"
-#include "light.hpp"
-#include "textura.hpp"
-#include "cube.hpp"
-#include "spotLight.hpp"
+#include "include/vec3.hpp"
+#include "include/ray.hpp"
+#include "include/camera.hpp"
+#include "include/cena.hpp"
+#include "include/sphere.hpp"
+#include "include/plane.hpp"
+#include "include/cylinder.hpp"
+#include "include/cone.hpp"
+#include "include/light.hpp"
+#include "include/textura.hpp"
+#include "include/cube.hpp"
+#include "include/spotLight.hpp"
 using namespace std;
 
 #define M_PI 3.14159265358979323846
