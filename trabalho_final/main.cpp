@@ -51,17 +51,22 @@ int main(int argc, char* argv[]) {
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    //Camera cam(Vec3(0, 0, -0.5),Vec3(1.7, -0.5,-1.7),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
-    Camera cam(Vec3(0, 0, 1),Vec3(0, 0, 1),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
+    //Camera cam(Vec3(2.8, 1.5, 3.0),Vec3(3.7, 1, 2.3),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
+    Camera cam(
+        Vec3(2.0, 1.5, 5.0),  
+        Vec3(2.0, 1.5, 4.0),  
+        Vec3(0,1,0),
+        1, -1.0, 1.0, -1.0, 1.0
+    );
 
     std::vector<Light> luzes;
-    luzes.push_back(Light(Vec3(-1,1.4,0.2),Vec3(0.7,0.7,0.7)));
+    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.7,0.7,0.7)));
     std::vector<SpotLight> spotLights;
     spotLights.push_back(SpotLight(
-        Vec3(1.7, 1.4, -1.8),        
+        Vec3(3.7, 2.9, 2.2),        
         Vec3(1.0, 1.0, 0.8),          
-        Vec3(0, -1, 0).normalize(),               
-        M_PI / 8                    
+        Vec3(0, -1, 0),               
+        M_PI / 8                  
     )); 
     Texture* texturaMadeira = new Texture();
     Texture* paredeMadeira = new Texture();
@@ -112,69 +117,76 @@ int main(int argc, char* argv[]) {
     Material filme1 = {Vec3(0.6, 0.2, 0.8), 0.2, 0.8, 0.6, 64.0};
     Material filme2 = {Vec3(0.0, 0.8, 0.8), 0.2, 0.8, 0.6, 64.0};
     Material filme3 = {Vec3(0.1, 0.8, 0.1), 0.2, 0.8, 0.6, 64.0};
+    Material lustre = {Vec3(0.9, 0.7, 0.0), 0.3, 0.7, 0.2, 10.0};
     
-    Cube* cube1 = new Cube(Vec3(-0.1, -1.3,-1.4), 0.5, cubo_mat, "Gift1");
+    Cube* cube1 = new Cube(Vec3(1.9, 0.2, 2.6), 0.5, cubo_mat, "Gift1");
     cube1->rotateY(M_PI / 4);
     cube1->translate(0.2,0,0);
 
-    Cube* cube2 = new Cube(Vec3(-0.9, -1.3,-1.289), 0.5, cubo_mat3, "Gift2");
+    Cube* cube2 = new Cube(Vec3(1.1, 0.2, 2.711), 0.5, cubo_mat3, "Gift2");
     cube2->scaleTransform(1.5, 1.0, 1.0);
     cube2->rotateY(M_PI / 4);
 
-    Cube* cube3 = new Cube(Vec3(0.6, -1.3,-1.2), 0.5, cubo_mat2, "Gift3");
+    Cube* cube3 = new Cube(Vec3(2.6, 0.2, 2.8), 0.5, cubo_mat2, "Gift3");
     cube3->scaleTransform(1.5, 1.0, 1.0);
 
-    Cube* cube4 = new Cube(Vec3(-0.3, -1.3,-1.156), 0.5, cubo_mat4, "Gift4");  
+    Cube* cube4 = new Cube(Vec3(1.7, 0.2, 2.844), 0.5, cubo_mat4, "Gift4");  
     cube4->scaleTransform(0.5, 0.8, 2.0);
     cube4->rotateY(M_PI/6 );
 
 
-    Cube* prateleira1 = new Cube(Vec3(1.7, -0.5,-1.7), 0.3, prateleira, "prateleira1");
+    Cube* prateleira1 = new Cube(Vec3(3.7, 1.0, 2.3), 0.3, prateleira, "prateleira1");
     prateleira1->scaleTransform(1.23, 0.3, 4.0);  
 
-    Cube* prateleira2 = new Cube(Vec3(1.7, -0.2,-1.7), 0.3, prateleira, "prateleira2");
+    Cube* prateleira2 = new Cube(Vec3(3.7, 1.3, 2.3), 0.3, prateleira, "prateleira2");
     prateleira2->scaleTransform(1.23, 0.3, 4.0); 
 
-    Cube* movie1 = new Cube(Vec3(1.7, -0.36,-1.65), 0.3, filme1, "movie1");
+    Cube* movie1 = new Cube(Vec3(3.7, 1.14, 2.35), 0.3, filme1, "movie1");
     movie1->scaleTransform(1.0, 0.4, 1.0); 
     movie1->rotateX(M_PI/2);
     movie1->shearTransform(0.3, 0, 0, 0, 0, 0); 
 
-    Cube* movie2 = new Cube(Vec3(1.7, -0.36,-1.58), 0.3, filme2, "movie2");
+    Cube* movie2 = new Cube(Vec3(3.7, 1.14, 2.42), 0.3, filme2, "movie2");
     movie2->scaleTransform(1.0, 0.4, 1.0); 
     movie2->rotateX(M_PI/2);
     movie2->shearTransform(0.3, 0, 0, 0, 0, 0); 
     
-    Cube* movie3 = new Cube(Vec3(1.7, -0.36,-1.72), 0.3, filme3, "movie3");
+    Cube* movie3 = new Cube(Vec3(3.7, 1.14, 2.28), 0.3, filme3, "movie3");
     movie3->scaleTransform(1.0, 0.4, 1.0); 
     movie3->rotateX(M_PI/2);
     movie3->shearTransform(0.3, 0, 0, 0, 0, 0); 
     
 
-    Cone* coneDec1 = new Cone(Vec3(0, 0, 0), Vec3(0,1,0), 0.5, 0.8, decoracao1, true, "ampulheta1");
+    Cone* coneDec1 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.5, 0.8, decoracao1, true, "ampulheta1");
 
-    Cone* coneDec2 = new Cone(Vec3(0, 0, 0), Vec3(0,1,0), 0.4, 0.7, decoracao1, true, "ampulheta2");
+    Cone* coneDec2 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.4, 0.7, decoracao1, true, "ampulheta2");
 
     
     coneDec1->scaleTransform(0.3, 0.3, 0.3);
-    coneDec1->translate(1.67, -0.15, -1.48);
+    coneDec1->translate(3.73, 1.33, 2.42);
     
     coneDec2->scaleTransform(0.3, 0.3, 0.3);
     coneDec2->rotateX(M_PI);
-    coneDec2->translate(1.67, 0.18, -1.48);
+    coneDec2->translate(3.73, 1.68, 2.42);
 
-    Sphere* cristal = new Sphere(Vec3(1.67, -0.04, -1.78), 0.06, esf2, "cristal");
-    Cube* suporte = new Cube(Vec3(1.67, -0.131,-1.78), 0.3, suporte_esf, "suporte cristal");
+    Sphere* cristal = new Sphere(Vec3(3.67, 1.46, 2.22), 0.06, esf2, "cristal");
+    Cube* suporte = new Cube(Vec3(3.67, 1.369, 2.22), 0.3, suporte_esf, "suporte cristal");
     suporte->scaleTransform(1.0, 0.2, 1.0); 
 
+    Cone* lustre1 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.4, 0.7, lustre, "lustre");
+    lustre1->scaleTransform(0.6, 0.6, 0.9); 
+    lustre1->translate(3.95, 2.21, 2.2);
+    
     Cena cena;
+
+    //cena.adicionar(lustre1);
 
     cena.adicionar(movie1);
     cena.adicionar(movie2);
     cena.adicionar(movie3);
         
-   cena.adicionar(cristal);
-   cena.adicionar(suporte);
+    cena.adicionar(cristal);
+    cena.adicionar(suporte);
 
     cena.adicionar(prateleira1);
     cena.adicionar(prateleira2);
@@ -186,15 +198,15 @@ int main(int argc, char* argv[]) {
     cena.adicionar(cube2);
     cena.adicionar(cube4);
 
-    cena.adicionar(new Plane(Vec3(0,-1.5,0),Vec3(0,1,0),chao, "chao"));
-    cena.adicionar(new Plane(Vec3(2,-1.5,0),Vec3(-1,0,0),parede, "parede"));
-    cena.adicionar(new Plane(Vec3(2,-1.5,-4),Vec3(0,0,1),fundo, "fundo"));
-    cena.adicionar(new Plane(Vec3(-2,-1.5,0),Vec3(1,0,0),parede, "parede"));
-    cena.adicionar(new Plane(Vec3(0,1.5,0),Vec3(0,-1,0),teto, "teto"));
+    cena.adicionar(new Plane(Vec3(2.0, 0.0, 4.0),Vec3(0,1,0),chao, "chao"));
+    cena.adicionar(new Plane(Vec3(4.0, 0.0, 4.0),Vec3(-1,0,0),parede, "parede"));
+    cena.adicionar(new Plane(Vec3(0.0, 0.0, 0.0),Vec3(0,0,1),fundo, "fundo"));
+    cena.adicionar(new Plane(Vec3(0.0, 0.0, 4.0),Vec3(1,0,0),parede, "parede"));
+    cena.adicionar(new Plane(Vec3(Vec3(2.0, 3.0, 4.0)),Vec3(0,-1,0),teto, "teto"));
 
-    cena.adicionar(new Cylinder(Vec3(0, -1.5,-2.0),Vec3(0,1,0),0.05, 0.9, cil, true, true, "tronco"));
-    cena.adicionar(new Cone(Vec3(0, -0.6, -2), Vec3(0,1,0),0.9,1.5,con, true, "arvore"));
-    cena.adicionar(new Sphere(Vec3(0, 0.95,-2.0),0.05,esf, "topo arvore"));
+    cena.adicionar(new Cylinder(Vec3(2.0, 0.0, 2.0),Vec3(0,1,0),0.05, 0.9, cil, true, true, "tronco"));
+    cena.adicionar(new Cone(Vec3(2.0, 0.9, 2.0), Vec3(0,1,0),0.9,1.5,con, true, "arvore"));
+    cena.adicionar(new Sphere(Vec3(2.0, 2.45, 2.0),0.05,esf, "topo arvore"));
 
     std::vector<uint8_t> framebuffer(width * height * 3);
 
