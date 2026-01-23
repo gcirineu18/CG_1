@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     );
 
     std::vector<Light> luzes;
-    luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.3,0,0)));
+    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.7,0.7,0.7)));
 
     std::vector<SpotLight> spotLights;
     spotLights.push_back(SpotLight(
@@ -116,26 +116,26 @@ int main(int argc, char* argv[]) {
     float ka = 0.2;
     
     //Material material = {cor, kd, ke, ka, m, useTexture, texture}
-    Material chao = {Vec3(0.2,0.2,0.2), 0.7, 0.1, ka, 20.0, true, texturaMadeira};
-    Material parede = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, paredeMadeira};
-    Material fundo = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, paredeMadeira};
-    Material teto = {Vec3(0.5,0.5,0.5), 0.933, 0.933, ka, 1.0, true, tetoTex};
-    Material cil = {Vec3(0.39,0.12,0), 0.824, 0.706, ka, 2.0};
-    Material con = {Vec3(0.22,0.73,0.37), 0.0, 1.0, ka, 2.0};
-    Material esf = {Vec3(1.0, 0.73, 0.37), 0.854, 0.647, ka, 2.0};
-    Material cubo_mat = {Vec3(1.0,1.,0.37), 0.0, 1.0, ka, 2.0, true, xGift};  
-    Material cubo_mat2 = {Vec3(1.0,1.,0.37), 0.0, 1.0, ka, 2.0, true, xGift2};  
-    Material cubo_mat3 = {Vec3(1.0,1.,0.37), 0.0, 1.0, ka, 2.0, true, xGift3}; 
-    Material cubo_mat4 = {Vec3(1.0,1.,0.37), 0.0, 1.0, ka, 2.0, true, xGift4};
-    Material esf2 = {Vec3(0.9, 0.95, 1.0), 0.0, 0.1, ka, 128.0};
-    Material suporte_esf= {Vec3(0.1, 0.2, 0.9), 0.2, 0.8, ka, 32.0};
-    Material prateleira = {Vec3(0.55, 0.27, 0.07), 0.3, 0.7, ka, 10.0, false, nullptr}; 
-    Material decoracao1 = {Vec3(0.8, 0.1, 0.1), 0.5, 0.8, ka, 32.0}; 
-    Material decoracao2 = {Vec3(0.2, 0.5, 0.9), 0.2, 0.8, ka, 32.0}; 
-    Material filme1 = {Vec3(0.6, 0.2, 0.8), 0.2, 0.8, ka, 64.0};
-    Material filme2 = {Vec3(0.0, 0.8, 0.8), 0.2, 0.8, ka, 64.0};
-    Material filme3 = {Vec3(0.1, 0.8, 0.1), 0.2, 0.8, ka, 64.0};
-    Material lustre = {Vec3(0.9, 0.7, 0.0), 0.3, 0.7, ka, 10.0};
+    Material chao = {Vec3(0.2,0.2,0.2), 0.7, 0.1, 0.2, 20.0, true, texturaMadeira};
+    Material parede = {Vec3(0.2,0.2,0.8), 0.686, 0.933, 0.933, 1.0, true, paredeMadeira};
+    Material fundo = {Vec3(0.2,0.2,0.8), 0.686, 0.933, 0.933, 1.0, true, paredeMadeira};
+    Material teto = {Vec3(0.5,0.5,0.5), 0.933, 0.933, 0.933, 1.0, true, tetoTex};
+    Material cil = {Vec3(0.39,0.12,0), 0.824, 0.706, 0.549, 2.0};
+    Material con = {Vec3(0.22,0.73,0.37), 0.0, 1.0, 0.498, 2.0};
+    Material esf = {Vec3(1.0, 0.73, 0.37), 0.854, 0.647, 0.125, 2.0};
+    Material cubo_mat = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift};  
+    Material cubo_mat2 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift2};  
+    Material cubo_mat3 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift3}; 
+    Material cubo_mat4 = {Vec3(1.0,1.,0.37), 0.0, 1.0, 0.498, 2.0, true, xGift4};
+    Material esf2 = {Vec3(0.9, 0.95, 1.0), 0.0, 0.1, 0.95, 128.0};
+    Material suporte_esf= {Vec3(0.1, 0.2, 0.9), 0.2, 0.8, 0.5, 32.0};
+    Material prateleira = {Vec3(0.55, 0.27, 0.07), 0.3, 0.7, 0.2, 10.0, false, nullptr}; 
+    Material decoracao1 = {Vec3(0.8, 0.1, 0.1), 0.5, 0.8, 0.5, 32.0}; 
+    Material decoracao2 = {Vec3(0.2, 0.5, 0.9), 0.2, 0.8, 0.5, 32.0}; 
+    Material filme1 = {Vec3(0.6, 0.2, 0.8), 0.2, 0.8, 0.6, 64.0};
+    Material filme2 = {Vec3(0.0, 0.8, 0.8), 0.2, 0.8, 0.6, 64.0};
+    Material filme3 = {Vec3(0.1, 0.8, 0.1), 0.2, 0.8, 0.6, 64.0};
+    Material lustre = {Vec3(0.9, 0.7, 0.0), 0.3, 0.7, 0.2, 10.0};
     Material lenha = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, tronco};
     Material lareira = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, fogo};
     Material chamine = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, tijolo};
@@ -156,39 +156,39 @@ int main(int argc, char* argv[]) {
     cube4->rotateY(M_PI/6 );
 
 
-    Cube* prateleira1 = new Cube(Vec3(3.7, 1.0, 2.3), 0.3, prateleira, "prateleira1");
+    Cube* prateleira1 = new Cube(Vec3(3.8, 1.0, 2.3), 0.3, prateleira, "prateleira1");
     prateleira1->scaleTransform(1.23, 0.3, 4.0);  
 
-    Cube* prateleira2 = new Cube(Vec3(3.7, 1.3, 2.3), 0.3, prateleira, "prateleira2");
+    Cube* prateleira2 = new Cube(Vec3(3.8, 1.3, 2.3), 0.3, prateleira, "prateleira2");
     prateleira2->scaleTransform(1.23, 0.3, 4.0); 
 
-    Cube* movie1 = new Cube(Vec3(3.7, 1.14, 2.35), 0.3, filme1, "movie1");
+    Cube* movie1 = new Cube(Vec3(3.8, 1.14, 2.35), 0.3, filme1, "movie1");
     movie1->scaleTransform(1.0, 0.4, 1.0); 
     movie1->rotateX(M_PI/2);
     movie1->shearTransform(0.3, 0, 0, 0, 0, 0); 
 
-    Cube* movie2 = new Cube(Vec3(3.7, 1.14, 2.42), 0.3, filme2, "movie2");
+    Cube* movie2 = new Cube(Vec3(3.8, 1.14, 2.42), 0.3, filme2, "movie2");
     movie2->scaleTransform(1.0, 0.4, 1.0); 
     movie2->rotateX(M_PI/2);
     movie2->shearTransform(0.3, 0, 0, 0, 0, 0); 
     
-    Cube* movie3 = new Cube(Vec3(3.7, 1.14, 2.28), 0.3, filme3, "movie3");
+    Cube* movie3 = new Cube(Vec3(3.8, 1.14, 2.28), 0.3, filme3, "movie3");
     movie3->scaleTransform(1.0, 0.4, 1.0); 
     movie3->rotateX(M_PI/2);
     movie3->shearTransform(0.3, 0, 0, 0, 0, 0); 
 
     Cone* coneDec1 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.5, 0.8, decoracao1, true, "ampulheta1");
     coneDec1->scaleTransform(0.3, 0.3, 0.3);
-    coneDec1->translate(3.73, 1.33, 2.42);
+    coneDec1->translate(3.83, 1.33, 2.42);
     
     Cone* coneDec2 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.4, 0.7, decoracao1, true, "ampulheta2");  
     coneDec2->scaleTransform(0.3, 0.3, 0.3);
     coneDec2->rotateX(M_PI);
-    coneDec2->translate(3.73, 1.68, 2.42);
+    coneDec2->translate(3.83, 1.68, 2.42);
 
-    Sphere* cristal = new Sphere(Vec3(3.67, 1.46, 2.22), 0.06, esf2, "cristal");
+    Sphere* cristal = new Sphere(Vec3(3.77, 1.46, 2.22), 0.06, esf2, "cristal");
 
-    Cube* suporte = new Cube(Vec3(3.67, 1.369, 2.22), 0.3, suporte_esf, "suporte cristal");
+    Cube* suporte = new Cube(Vec3(3.77, 1.369, 2.22), 0.3, suporte_esf, "suporte cristal");
     suporte->scaleTransform(1.0, 0.2, 1.0); 
 
     Cone* lustre1 = new Cone(Vec3(0.0, 0.0, 0.0), Vec3(0,1,0), 0.4, 0.7, lustre, false, "lustre");
@@ -244,7 +244,7 @@ int main(int argc, char* argv[]) {
     cena.adicionar(cube2);
     cena.adicionar(cube4);
 
-    cena.adicionar(lustre1);
+   // cena.adicionar(lustre1);
 
     cena.adicionar(lenha1);
     cena.adicionar(lenha2);
