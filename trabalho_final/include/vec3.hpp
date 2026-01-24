@@ -76,6 +76,36 @@ struct Vec3 {
         return Vec3(nx, ny, nz);
     }
 
+    // Rotação Arbitrária
+    // Método de Mudança de Sistemas de Coordenadas
+    Vec3 rotArb(float a, Vec3 axis) const {
+        Vec3 w = axis.normalize();
+
+        Vec3 t = (std::abs(w.x) > 0.9f) ? Vec3(0, 1, 0) : Vec3(1, 0, 0);
+        Vec3 u = t.cross(w).normalize();
+        Vec3 v = w.cross(u);
+
+        float B[4][4] = {
+            {u.x, u.y, u.z, 0},
+            {v.x, v.y, v.z, 0},
+            {w.x, w.y, w.z, 0},
+            {  0,   0,   0, 1}
+        };
+
+        float px = (B[0][0] * x) + (B[0][1] * y) + (B[0][2] * z);
+        float py = (B[1][0] * x) + (B[1][1] * y) + (B[1][2] * z);
+        float pz = (B[2][0] * x) + (B[2][1] * y) + (B[2][2] * z);
+        Vec3 p_prime(px, py, pz);
+
+        Vec3 p_rot = p_prime.rotZ(a);
+
+        float nx = (B[0][0] * p_rot.x) + (B[1][0] * p_rot.y) + (B[2][0] * p_rot.z);
+        float ny = (B[0][1] * p_rot.x) + (B[1][1] * p_rot.y) + (B[2][1] * p_rot.z);
+        float nz = (B[0][2] * p_rot.x) + (B[1][2] * p_rot.y) + (B[2][2] * p_rot.z);
+
+        return Vec3(nx, ny, nz);
+    }
+
     // ----- TRANSLAÇÃO -----
     Vec3 translate(float tx, float ty, float tz) const {
         float matrix[4][4] = {

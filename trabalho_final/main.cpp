@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 
     Cube* cube2 = new Cube(Vec3(1.68, 0.2, 2.4), 0.5, cubo_mat3, "Gift2");
     cube2->scaleTransform(1.2, 0.7, 0.7);
-    cube2->rotateY(M_PI / 4);
+    cube2->rotateArb(Vec3(0, 1, 0), M_PI / 4);
 
     Cube* cube3 = new Cube(Vec3(2.8, 0.2, 2.8), 0.5, cubo_mat2, "Gift3");
     cube3->scaleTransform(1.5, 1.0, 1.0);

@@ -91,6 +91,13 @@ public:
         createMesh(mat);
     }
 
+    void rotateArb(Vec3 axis, float angle) {
+        for(int i = 0; i < 8; i++) {
+            vertices[i] = vertices[i].rotArb(angle, axis);
+        }
+        createMesh(mat);
+    }
+
     void scaleTransform(float sx, float sy, float sz) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].scale(sx, sy, sz);
