@@ -9,10 +9,11 @@ public:
     Vec3 eye, up, para;
     float d;
     float xmin, xmax, ymin, ymax;
+    bool ortho;
 
     Vec3 u, v, w;
 
-    Camera(Vec3 _eye, Vec3 _para, Vec3 _up, float _d, float x0, float x1, float y0, float y1) {
+    Camera(Vec3 _eye, Vec3 _para, Vec3 _up, float _d, float x0, float x1, float y0, float y1, bool _ortho=false) {
         eye = _eye;
         para = _para;
         up = _up;
@@ -21,6 +22,7 @@ public:
         xmax = x1;
         ymin = y0;
         ymax = y1;
+        ortho =_ortho;
 
         Vec3 view = (para - eye);
         if (view.length() < 1e-6) view = Vec3(0, 0, -1);
@@ -41,8 +43,15 @@ public:
         float u_coord = xmin + s * (xmax - xmin);
         float v_coord = ymin + t * (ymax - ymin);
 
-        Vec3 dr = (w * d) + (u * u_coord) + (v * v_coord);
-        return Ray{eye, dr.normalize()};
+        if(ortho){
+            Vec3 origin = eye + (u * u_coord) + (v * v_coord);
+            return Ray{origin, w};
+        } else{
+            Vec3 dr = (w * d) + (u * u_coord) + (v * v_coord);
+            return Ray{eye, dr.normalize()};
+        }
+
+        
     }
 };
 

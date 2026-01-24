@@ -40,7 +40,7 @@ public:
             double distL = (spot.position - hit.p).length();
             
             // Verificar se está dentro do cone
-            float intensity = spot.getIntensity(L * -1.0); 
+            float intensity = spot.getIntensity(-L); 
             
             if (intensity > 0.01f) {
                 // Shadow ray
