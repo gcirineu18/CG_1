@@ -70,46 +70,46 @@ public:
         triangles.push_back(Triangle(v3, v6, v7, m));
     }
 
-    void rotateY(double angle) {
+    void rotateY(float angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotY(angle);
         }
         createMesh(mat);
     }
 
-    void rotateX(double angle) {
+    void rotateX(float angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotX(angle);
         }
         createMesh(mat);
     }
 
-    void rotateZ(double angle) {
+    void rotateZ(float angle) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].rotZ(angle);
         }
         createMesh(mat);
     }
 
-    void scaleTransform(double sx, double sy, double sz) {
+    void scaleTransform(float sx, float sy, float sz) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].scale(sx, sy, sz);
         }
         createMesh(mat);
     }
 
-    void scaleTransform(double s) {
+    void scaleTransform(float s) {
         scaleTransform(s, s, s);
     }
 
-    void shearTransform(double xy, double xz, double yx, double yz, double zx, double zy) {
+    void shearTransform(float xy, float xz, float yx, float yz, float zx, float zy) {
         for (int i = 0; i < 8; i++) {
             vertices[i] = vertices[i].shear(xy, xz, yx, yz, zx, zy);
         }
         createMesh(mat);
     }
 
-    void translate(double tx, double ty, double tz) {
+    void translate(float tx, float ty, float tz) {
         center = center.translate(tx, ty, tz);
         min_corner = min_corner.translate(tx, ty, tz);
         max_corner = max_corner.translate(tx, ty, tz);

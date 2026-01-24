@@ -1,11 +1,14 @@
 #ifndef CENA_HPP
 #define CENA_HPP
+using namespace std;
 
 #include <vector>
 #include "object.hpp"
 
 class Cena{
 public:
+    ~Cena(){}
+    
     std::vector<Object*> objetos;
     Vec3 bg_color = Vec3(0.2f, 0.2f, 0.2f);
 

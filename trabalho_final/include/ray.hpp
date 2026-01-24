@@ -9,7 +9,7 @@ struct Ray {
 
     Ray(const Vec3& o, const Vec3& d) : origin(o), direction(d) {}
 
-    Vec3 pt(double t) const { return origin + direction * t; }
+    Vec3 pt(float t) const { return origin + direction * t; }
 };
 
 #endif

@@ -37,7 +37,7 @@ public:
 
         for (const auto& spot : spotLights) {
             Vec3 L = (spot.position - hit.p).normalize();
-            double distL = (spot.position - hit.p).length();
+            float distL = (spot.position - hit.p).length();
             
             // Verificar se está dentro do cone
             float intensity = spot.getIntensity(-L); 
@@ -54,7 +54,7 @@ public:
                 }
                 
                 if (!emSombra) {
-                    double dotNL = std::max(0.0, hit.normal.dot(L));
+                    float dotNL = std::max(0.0f, hit.normal.dot(L));
                     
                     // Aplicar intensidade do spotlight
                     Vec3 lightContrib = (baseColor * spot.color) * 
@@ -64,7 +64,7 @@ public:
                     // Specular
                     Vec3 V_d = (cam.eye - hit.p).normalize();
                     Vec3 R_d = (hit.normal * (2.0 * hit.normal.dot(L))) - L;
-                    double dotRV = std::max(0.0, R_d.dot(V_d));
+                    float dotRV = std::max(0.0f, R_d.dot(V_d));
                     
                     corFinal = corFinal + (spot.color ) * 
                             (hit.mat.ks * std::pow(dotRV, hit.mat.shininess));

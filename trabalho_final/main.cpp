@@ -19,7 +19,7 @@ using namespace std;
 #define M_PI 3.14159265358979323846
 
 // Função para limitar os valores entre 0 e 1
-double clamp(double x) {
+float clamp(float x) {
     if (x < 0) return 0;
     if (x > 1) return 1;
     return x;
@@ -61,8 +61,8 @@ int main(int argc, char* argv[]) {
      );
 
     std::vector<Light> luzes;
-    luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.15,0,0)));
-    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.15,0.15,0.15)));
+    luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.2,0,0)));
+    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.2,0.2,0.2)));
 
     std::vector<SpotLight> spotLights;
     spotLights.push_back(SpotLight(
@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
     //Material material = {cor, kd, ke, ka, m, useTexture, texture}
     Material chao = {Vec3(0.2,0.2,0.2), 0.7, 0.1, ka, 20.0, true, texturaMadeira};
     Material parede = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, paredeMadeira};
-    Material fundo = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, paredeMadeira};
+    //Material fundo = {Vec3(0.2,0.2,0.8), 0.686, 0.933, ka, 1.0, true, paredeMadeira};
     Material teto = {Vec3(0.5,0.5,0.5), 0.933, 0.933, ka, 1.0, true, tetoTex};
     Material cil = { Vec3(0.39,0.12,0), 0.824, 0.706, ka, 2.0};
     Material cadeira = { Vec3(0.22, 0.1, 0.01), 0.824, 0.706, ka, 2.0};
@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
 
     cena.adicionar(new Plane(Vec3(2.0, 0.0, 4.0),Vec3(0,1,0),chao, "chao"));
     cena.adicionar(new Plane(Vec3(4.0, 0.0, 4.0),Vec3(-1,0,0),parede, "parede"));
-    cena.adicionar(new Plane(Vec3(0.0, 0.0, 0.0),Vec3(0,0,1),fundo, "fundo"));
+    cena.adicionar(new Plane(Vec3(0.0, 0.0, 0.0),Vec3(0,0,1),parede, "fundo"));
     cena.adicionar(new Plane(Vec3(0.0, 0.0, 4.0),Vec3(1,0,0),parede, "parede"));
     cena.adicionar(new Plane(Vec3(Vec3(2.0, 3.0, 4.0)),Vec3(0,-1,0),teto, "teto"));
 
@@ -299,8 +299,8 @@ int main(int argc, char* argv[]) {
 
     for (int y = height - 1; y >= 0; --y) {
         for (int x = 0; x < width; ++x) {
-            double u = (double)x /(width - 1);
-            double v = (double)y /(height - 1);
+            float u = (float)x /(width - 1);
+            float v = (float)y /(height - 1);
 
             Ray r = cam.gerarRaio(u, v);
             HitRecord hit;

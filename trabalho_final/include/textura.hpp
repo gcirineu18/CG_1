@@ -55,7 +55,7 @@ public:
     }
 
     // retornar a cor de um pixel da textura com coordenadas UV
-    Vec3 sample(double u, double v) const {
+    Vec3 sample(float u, float v) const {
         if (pixels.empty()) return Vec3(1, 0, 1); // Magenta se erro
         
         // Repetir textura (wrap)

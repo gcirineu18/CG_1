@@ -23,7 +23,7 @@ struct Light {
         Vec3 corFinal = baseColor * hit.mat.ka;
         for (const auto& luz : luzes){
             Vec3 L = (luz.position - hit.p).normalize();
-            double distL = (luz.position - hit.p).length();
+            float distL = (luz.position - hit.p).length();
 
             Ray shadowRay(hit.p + hit.normal * 0.01, L);
             HitRecord shadowHit;
@@ -34,12 +34,12 @@ struct Light {
             }
 
             if(!emSombra){
-                double dotNL = std::max(0.0, hit.normal.dot(L));
+                float dotNL = std::max(0.0f, hit.normal.dot(L));
                 corFinal = corFinal + (baseColor * luz.color)* (hit.mat.kd * dotNL);
 
                 Vec3 V_d = (cam.eye - hit.p).normalize();
                 Vec3 R_d = (hit.normal * (2.0 * hit.normal.dot(L))) - L;
-                double dotRV = std::max(0.0, R_d.dot(V_d));
+                float dotRV = std::max(0.0f, R_d.dot(V_d));
 
                 corFinal = corFinal + (luz.color) * (hit.mat.ks * std::pow(dotRV, hit.mat.shininess));
             }
