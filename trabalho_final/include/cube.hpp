@@ -15,7 +15,6 @@ public:
 
     Vec3 vertices[8];
 
-    // Construtor: posição e tamanho do cubo
     Cube(Vec3 center, float size, Material m, const char* nome) {
         mat = m;
         name = nome;
@@ -31,7 +30,7 @@ public:
         createMesh(m);
     }
 
-    // ADICIONAR: Inicializar vértices no estado original
+    // Inicializar vértices no estado original
     void initializeVertices() {
         float half = size / 3.0f;
         vertices[0] = Vec3(-half, -half, -half);
@@ -57,11 +56,10 @@ public:
         Vec3 v6 = vertices[6] + center;
         Vec3 v7 = vertices[7] + center;
 
-        // Faces (igual antes)
         triangles.push_back(Triangle(v0, v1, v2, m));
         triangles.push_back(Triangle(v0, v2, v3, m));
-        triangles.push_back(Triangle(v5, v4, v7, m));
-        triangles.push_back(Triangle(v5, v7, v6, m));
+        triangles.push_back(Triangle(v6, v7, v5, m));
+        triangles.push_back(Triangle(v4, v5, v7, m));
         triangles.push_back(Triangle(v4, v0, v3, m));
         triangles.push_back(Triangle(v4, v3, v7, m));
         triangles.push_back(Triangle(v1, v5, v6, m));
@@ -139,37 +137,6 @@ public:
         }
         return hit;
     }
-
-   
-    private:
-        void updateMeshWithVertices(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, 
-            Vec3 v4, Vec3 v5, Vec3 v6, Vec3 v7)
-        {
-            triangles.clear();
-            
-            v0 = v0 + center;
-            v1 = v1 + center;
-            v2 = v2 + center;
-            v3 = v3 + center;
-            v4 = v4 + center;
-            v5 = v5 + center;
-            v6 = v6 + center;
-            v7 = v7 + center;
-
-            triangles.push_back(Triangle(v0, v1, v2, mat));
-            triangles.push_back(Triangle(v0, v2, v3, mat));
-            triangles.push_back(Triangle(v5, v4, v7, mat));
-            triangles.push_back(Triangle(v5, v7, v6, mat));
-            triangles.push_back(Triangle(v4, v0, v3, mat));
-            triangles.push_back(Triangle(v4, v3, v7, mat));
-            triangles.push_back(Triangle(v1, v5, v6, mat));
-            triangles.push_back(Triangle(v1, v6, v2, mat));
-            triangles.push_back(Triangle(v4, v5, v1, mat));
-            triangles.push_back(Triangle(v4, v1, v0, mat));
-            triangles.push_back(Triangle(v3, v2, v6, mat));
-            triangles.push_back(Triangle(v3, v6, v7, mat));
-
-        }
 
 };
 
