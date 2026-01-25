@@ -92,9 +92,9 @@ int main(int argc, char* argv[]) {
     Texture* tijolo = new Texture();
 
     if (!texturaMadeira->loadImage("images/madeira.jpeg") ) {
-        std::cerr << "Erro ao carregar textura madeira.jpeg!" << std::endl;
+        std::cerr << "Erro ao carregar textura madeira.jpeeg!" << std::endl;
     }
-    if (!paredeMadeira->loadImage("images/parede_madeira.jpeg") ) {
+    if (!paredeMadeira->loadImage("images/parede_madeira.webp") ) {
         std::cerr << "Erro ao carregar textura madeira.jpeg!" << std::endl;
     }
     if (!xGift->loadImage("images/embrulho_natal.jpg") ) {

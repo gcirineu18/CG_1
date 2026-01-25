@@ -30,7 +30,7 @@ public:
         Vec3 baseColor = hit.mat.color;
 
         if (hit.mat.useTexture && hit.mat.texture != nullptr) {
-            baseColor = hit.mat.texture->sample(hit.u, hit.v);
+            baseColor = hit.mat.texture->sample(hit.u*0.5, hit.v*0.5);
         }
                 
         Vec3 corFinal = Vec3(0, 0, 0);
