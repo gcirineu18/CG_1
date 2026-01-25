@@ -69,8 +69,8 @@ int main(int argc, char* argv[]) {
      );
 
     std::vector<Light> luzes;
-    luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.2,0,0)));
-    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.2,0.2,0.2)));
+    luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.25,0.04,0)));
+    luzes.push_back(Light(Vec3(1.0, 2.9, 4.2),Vec3(0.3,0.3,0.3)));
 
     std::vector<SpotLight> spotLights;
     spotLights.push_back(SpotLight(
@@ -106,8 +106,8 @@ int main(int argc, char* argv[]) {
     if (!xGift3->loadImage("images/embrulho_natal3.jpg") ) {
         std::cerr << "Erro ao carregar embrulho_natal3.jpg!" << std::endl;
     }
-    if (!xGift4->loadImage("images/finlandia_gift.jpg") ) {
-        std::cerr << "Erro ao carregar finlandia_gift.jpg!" << std::endl;
+    if (!xGift4->loadImage("images/embrulho_natal4.jpg") ) {
+        std::cerr << "Erro ao carregar embrulho_natal4.jpg!" << std::endl;
     }
     if (!tetoTex->loadImage("images/teto.jpg") ) {
         std::cerr << "Erro ao carregar teto.jpg!" << std::endl;
@@ -221,19 +221,19 @@ int main(int argc, char* argv[]) {
     lareira1->translate(0.75, 0.35, 0.05);
 
     Cube* tijolo1 = new Cube(Vec3(0.0,0.0,0.0), 0.5, chamine, "tijolo1");
-    tijolo1->scaleTransform(0.5, 2.0, 0.5);
+    tijolo1->scaleTransform(0.5, 2.0, 1.5);
     tijolo1->translate(0.4,0.35,0.0);
     
     Cube* tijolo2 = new Cube(Vec3(0.0,0.0,0.0), 0.5, chamine, "tijolo2");
-    tijolo2->scaleTransform(0.5, 2.0, 0.5);
+    tijolo2->scaleTransform(0.5, 2.0, 1.5);
     tijolo2->translate(1.1,0.35,0.0);
 
     Cube* tijolo3 = new Cube(Vec3(0.0,0.0,0.0), 0.5, chamine, "tijolo3");
-    tijolo3->scaleTransform(2.6, 0.5, 0.5);
+    tijolo3->scaleTransform(2.6, 0.5, 1.5);
     tijolo3->translate(0.75,0.766,0.0);
 
     Cube* tijolo4 = new Cube(Vec3(0.0,0.0,0.0), 0.5, chamine, "tijolo4");
-    tijolo4->scaleTransform(2.0, 6.5, 0.5);
+    tijolo4->scaleTransform(2.0, 6.5, 1.5);
     tijolo4->translate(0.75,1.93,0.0);
 
     Cylinder* peCadeira1 = new Cylinder(Vec3(1.16, 0.0, 2.85),Vec3(0,1,0),0.02, 0.4, cadeira, true, true, "pe1");
