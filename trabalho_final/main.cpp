@@ -60,6 +60,13 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     //Camera cam(Vec3(2.8, 1.6, 3.0),Vec3(3.7, 1, 2.3),Vec3(0,1,0), 1,-1.0,1.0,-1.0,1.0);
+    // Camera cam(
+    //      Vec3(2.0, 1.5, 5.0),    // eye
+    //      Vec3(2.0, 1.5, 4.0),    // at
+    //      Vec3(0,1,0),            // up
+    //      1,                      // d => Alterar o valor para zoom in (> 1) e zoom out (< 1)
+    //      -2.0, 2.0, -2.0, 2.0, true
+    //  );
      Camera cam(
          Vec3(2.0, 1.5, 5.0),    // eye
          Vec3(2.0, 1.5, 4.0),    // at
