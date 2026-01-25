@@ -138,6 +138,7 @@ public:
                 if (temp_rec.t < closest_t) {
                     closest_t = temp_rec.t;
                     rec = temp_rec;
+                    rec.objectID = this->id;        // Forçar id do cubo em vez do id dos triângulos.
                     hit = true;
                 }
             }
