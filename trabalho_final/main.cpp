@@ -18,6 +18,14 @@ using namespace std;
 
 #define M_PI 3.14159265358979323846
 
+// Função para pegar nome do objeto pelo id
+const char* getObjectById(const Cena& cena, int id) {
+    for (auto obj: cena.objetos) {
+        if (obj->id == id) return obj->name;
+    }
+    return "Desconhecido";
+}
+
 // Função para limitar os valores entre 0 e 1
 float clamp(float x) {
     if (x < 0) return 0;
@@ -325,7 +333,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    std::cout << "Imagem gerada com sucesso!" << std::endl;
+    std::cout << "Imagem gerada com sucesso! Clique em algum objeto para testar o Picking" << std::endl;
 
     SDL_UpdateTexture(
         screenTexture,
@@ -334,12 +342,6 @@ int main(int argc, char* argv[]) {
         width * 3
     );
 
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, screenTexture, nullptr, nullptr);
-    SDL_RenderPresent(renderer);
-    
-    delete texturaMadeira;
-    IMG_Quit();
     bool running = true;
     SDL_Event e;
 
@@ -347,9 +349,37 @@ int main(int argc, char* argv[]) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 running = false;
+
+            // Implementando função Pick
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+                float u_clk = (float)mouseX / (width - 1);
+                float v_clk = (float)(height - 1 - mouseY) / (height - 1);
+
+                Ray raioPick = cam.gerarRaio(u_clk, v_clk);
+                HitRecord hitPick;
+
+                if (cena.trace(raioPick, hitPick)) {
+                    const char* nomeObj = getObjectById(cena, hitPick.objectID);
+
+                    cout << "Objeto Selecionado: " << nomeObj << " (ID: " << hitPick.objectID << ")" << endl;
+                    cout << "Ponto de Impacto: (" << hitPick.p.x << ", " << hitPick.p.y << ", " << hitPick.p.z << ")" << endl;
+                } else {
+                    cout << "Nenhum Objeto Acertado." << endl;
+                }
+            }
+
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, screenTexture, nullptr, nullptr);
+            SDL_RenderPresent(renderer);
+            SDL_Delay(16);
         }
-        SDL_Delay(16);
     }
+    
+    delete texturaMadeira;
+    IMG_Quit();
     SDL_Quit();
     
     return 0;
