@@ -67,13 +67,13 @@ int main(int argc, char* argv[]) {
     //      1,                      // d => Alterar o valor para zoom in (> 1) e zoom out (< 1)
     //      -2.0, 2.0, -2.0, 2.0, true
     //  );
-     Camera cam(
-         Vec3(2.0, 1.5, 5.0),    // eye
-         Vec3(2.0, 1.5, 4.0),    // at
-         Vec3(0,1,0),            // up
-         1,                      // d => Alterar o valor para zoom in (> 1) e zoom out (< 1)
-         -1.0, 1.0, -1.0, 1.0
-     );
+    Camera cam(
+        Vec3(2.0, 1.5, 5.0),    // eye
+        Vec3(2.0, 1.5, 4.0),    // at
+        Vec3(0,1,0),            // up
+        1,                      // d => Alterar o valor para zoom in (> 1) e zoom out (< 1)
+        -1.0, 1.0, -1.0, 1.0
+    );
 
     std::vector<Light> luzes;
     luzes.push_back(Light(Vec3(0.75, 0.35, 0.15),Vec3(0.25,0.04,0)));
@@ -101,8 +101,8 @@ int main(int argc, char* argv[]) {
     if (!texturaMadeira->loadImage("images/madeira.jpeg") ) {
         std::cerr << "Erro ao carregar textura madeira.jpeeg!" << std::endl;
     }
-    if (!paredeMadeira->loadImage("images/parede_madeira.webp") ) {
-        std::cerr << "Erro ao carregar textura madeira.jpeg!" << std::endl;
+    if (!paredeMadeira->loadImage("images/parede_madeira.jpg") ) {
+        std::cerr << "Erro ao carregar textura parede_madeira.jpg!" << std::endl;
     }
     if (!xGift->loadImage("images/embrulho_natal.jpg") ) {
         std::cerr << "Erro ao carregar embrulho_natal.jpg!" << std::endl;
